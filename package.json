@@ -1,0 +1,36 @@
+{
+  "name": "skizzle_smart_contracts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "deploy.js",
+  "scripts": {
+    "test": "node compile.js && mocha --timeout 3000000 -R spec --ui bdd"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/newfangadmin/skizzle_smart_contracts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/newfangadmin/skizzle_smart_contracts/issues"
+  },
+  "homepage": "https://github.com/newfangadmin/skizzle_smart_contracts#readme",
+  "dependencies": {
+    "did-resolver": "^1.1.0",
+    "eccrypto": "^1.1.2",
+    "elliptic": "^6.5.2",
+    "eth-crypto": "^1.5.0",
+    "ethereumjs-util": "^6.2.0",
+    "ethers": "^4.0.40",
+    "ethr-did": "^1.1.0",
+    "ethr-did-resolver": "^1.0.3",
+    "fs-extra": "^8.1.0",
+    "ganache-cli": "^6.7.0",
+    "mocha": "^6.2.1",
+    "secp256k1": "^3.7.1",
+    "solc": "^0.5.14",
+    "solc-import": "0.0.2",
+    "web3": "^1.2.2"
+  }
+}
