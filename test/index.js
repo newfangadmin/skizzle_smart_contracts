@@ -67,6 +67,7 @@ describe('Contract functions', async () => {
       tx = await newfangDID.functions.share(IDs[0], accounts[i], AccessTypes["read"],
         ethers.utils.hashMessage("asdf"), 120);
       await tx.wait();
+
       ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], accounts[i]));
       assert.ok(ACK.encrypted_key !== "0x0000000000000000000000000000000000000000000000000000000000000000",
         "encrypted key's hash not set");

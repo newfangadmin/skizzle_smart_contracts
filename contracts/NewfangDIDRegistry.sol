@@ -1,4 +1,5 @@
 pragma solidity ^0.5;
+pragma experimental ABIEncoderV2;
 
 import './SafeMath.sol';
 
@@ -7,12 +8,12 @@ contract NewfangDIDRegistry {
     bytes32 public log;
 
     // keccak256(storage index) => bytes32 newfang-specific-idstring
-    mapping(bytes32 => address) public owners; // file owners
+    mapping(bytes32 => string) public owners; // file owners
     // file id => access type => user => access control key
-    mapping(bytes32 => mapping(bytes32 => mapping(address => ACK))) public accessSpecifier;
-    mapping(bytes32 => mapping(bytes32 => address[])) public userAccess;
+    mapping(bytes32 => mapping(bytes32 => mapping(string => ACK))) public accessSpecifier;
+    mapping(bytes32 => mapping(bytes32 => string [])) public userAccess;
     mapping(address => uint) public changed;
-    mapping(address => uint) public nonce;
+    mapping(string => uint) public nonce;
     mapping(bytes32 => File) public files;
     address public owner;
 
@@ -24,7 +25,7 @@ contract NewfangDIDRegistry {
     }
 
     struct ACK {// Access Control Key
-        bytes32 encrypted_key; // hash of encrypted key
+        uint256 _type; // type of access email or public key
         uint256 validity;
     }
 
@@ -32,10 +33,31 @@ contract NewfangDIDRegistry {
         owner = msg.sender;
     }
 
-    modifier onlyFileOwner(bytes32 _file, address _identity) {
-        require(_identity == owners[_file]);
+    modifier onlyFileOwner(bytes32 _file, string memory _identity) {
+        require(compareStrings(_identity , owners[_file]));
         _;
     }
+
+    function compareStrings(string memory a, string memory b) internal pure returns (bool) {
+        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+
+
+    function toString(address _addr) public pure returns(string memory) {
+        bytes32 value = bytes32(uint256(_addr));
+        bytes memory alphabet = "0123456789abcdef";
+
+        bytes memory str = new bytes(42);
+        str[0] = '0';
+        str[1] = 'x';
+        for (uint i = 0; i < 20; i++) {
+            str[2+i*2] = alphabet[uint(uint8(value[i + 12] >> 4))];
+            str[3+i*2] = alphabet[uint(uint8(value[i + 12] & 0x0f))];
+        }
+        return string(str);
+    }
+
+
 
     function remove(address[] memory array, uint index) internal pure returns (address[] memory) {
 
@@ -47,10 +69,10 @@ contract NewfangDIDRegistry {
         return array;
     }
 
-    function getSigner(bytes32 payloadHash, address signer, uint8 v, bytes32 r, bytes32 s) public pure returns (address){
+    function getSigner(bytes32 payloadHash, string memory signer, uint8 v, bytes32 r, bytes32 s) public pure returns (address){
         bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", payloadHash));
         address actualSigner = ecrecover(messageHash, v, r, s);
-        require(signer == actualSigner);
+        require(compareStrings(signer, toString(actualSigner)));
         return actualSigner;
     }
 
@@ -59,8 +81,8 @@ contract NewfangDIDRegistry {
     * @dev This function will be used by createDID pubic function and createDIDSigned
     * @return bool
     */
-    function createDID(bytes32 _id, address _identity) internal returns (bool){
-        require(owners[_id] == address(0), "Owner already exist for this file");
+    function createDID(bytes32 _id, string memory _identity) internal returns (bool){
+        require(compareStrings(owners[_id], "0x0000000000000000000000000000000000000000"), "Owner already exist for this file");
         owners[_id] = _identity;
         nonce[_identity]++;
         return true;
@@ -71,13 +93,13 @@ contract NewfangDIDRegistry {
     * @return bool
     */
     function createDID(bytes32 _id) public returns (bool){
-        return createDID(_id, msg.sender);
+        return createDID(_id, toString(msg.sender));
     }
 
-    function createDIDSigned(bytes32 _id, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+    function createDIDSigned(bytes32 _id, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
         bytes32 payloadHash = keccak256(abi.encode(_id, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return createDID(_id, actualSigner);
+        return createDID(_id, toString(actualSigner));
     }
 
 
@@ -85,18 +107,18 @@ contract NewfangDIDRegistry {
         return userAccess[_file][_access_type].length;
     }
 
-    function getAllUsers(bytes32 _file, bytes32 _access_type) public view returns (address[] memory){
-        address[] memory users = userAccess[_file][_access_type];
-        address user;
-        for (uint i = 0; i < users.length; i++) {
-            user = userAccess[_file][_access_type][i];
-            if (accessSpecifier[_file][_access_type][user].validity <= now) {
-                //                users = remove(users, i);
-                delete users[i];
-            }
-        }
-        return users;
-    }
+    // function getAllUsers(bytes32 _file, bytes32 _access_type) public view returns (address[] memory){
+    //     address[] memory users = userAccess[_file][_access_type];
+    //     address user;
+    //     for (uint i = 0; i < users.length; i++) {
+    //         user = userAccess[_file][_access_type][i];
+    //         if (accessSpecifier[_file][_access_type][user].validity <= now) {
+    //             //                users = remove(users, i);
+    //             delete users[i];
+    //         }
+    //     }
+    //     return users;
+    // }
 
 
     /**
@@ -104,29 +126,29 @@ contract NewfangDIDRegistry {
      contract along with its validity
     * @return bool
     */
-    function share(address _identity, bytes32 _file, address _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){
+    function share(string memory _identity, bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){
         require(_validity != 0, "Validity must be non zero");
         ACK memory ack = accessSpecifier[_file][_access_type][_user];
         require(ack.validity == 0, "Already shared with user");
-        accessSpecifier[_file][_access_type][_user] = ACK(_access_key, now.add(_validity));
+        accessSpecifier[_file][_access_type][_user] = ACK(_type, now.add(_validity));
         userAccess[_file][_access_type].push(_user);
         nonce[_identity]++;
         return true;
     }
 
-    function share(bytes32 _file, address _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity) public returns (bool){
-        return share(msg.sender, _file, _user, _access_type, _access_key, _validity);
-    }
+    //    function share(bytes32 _file, address _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity) public returns (bool){
+    //        return share(msg.sender, _file, _user, _access_type, _access_key, _validity);
+    //    }
 
 
-    function shareSigned(bytes32 _file, address _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+    function shareSigned(bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _access_key, _validity, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return share(actualSigner, _file, _user, _access_type, _access_key, _validity);
+        return share(toString(actualSigner), _file, _type,_user, _access_type, _validity);
     }
 
-    function fileUpdate(address _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
-        require(owners[_file] != address(0), "File does not has an owner");
+    function fileUpdate(string memory _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
+        require(compareStrings(owners[_file], "0x0000000000000000000000000000000000000000"), "File does not has an owne");
         require(n > k, "n>k");
         require(file_size != 0, "Should not be 0");
         files[_file] = File(n, k, file_size, ueb);
@@ -134,25 +156,25 @@ contract NewfangDIDRegistry {
     }
 
     function fileUpdate(bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb) public returns (bool){
-        return fileUpdate(msg.sender, _file, n, k, file_size, ueb);
+        return fileUpdate(toString(msg.sender), _file, n, k, file_size, ueb);
     }
 
-    function fileUpdateSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool){
+    function fileUpdateSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (bool){
         bytes32 payloadHash = keccak256(abi.encode(_file, n, k, file_size, ueb, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return fileUpdate(actualSigner, _file, n, k, file_size, ueb);
+        return fileUpdate(toString(actualSigner), _file, n, k, file_size, ueb);
     }
 
     event KeyHash(
-        bytes32 key,
+        uint256 _type,
         uint256 validity
     );
 
-    function getKeyHash(address _identity, bytes32 _file, bytes32 _access_type) internal returns (bytes32, uint256){
+    function getKeyHash(string memory _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256, uint256){
         ACK memory ack = accessSpecifier[_file][_access_type][_identity];
         nonce[_identity]++;
-        emit KeyHash(ack.encrypted_key, ack.validity);
-        return (ack.encrypted_key, ack.validity);
+        emit KeyHash(ack._type, ack.validity);
+        return (ack._type, ack.validity);
     }
 
 
@@ -160,20 +182,20 @@ contract NewfangDIDRegistry {
     * @dev Fetch ACK hash of user
     * @return encrypted hash and validity
     */
-    function getKeyHash(bytes32 _file, bytes32 _access_type) public returns (bytes32, uint256){
-        return getKeyHash(msg.sender, _file, _access_type);
+    function getKeyHash(bytes32 _file, bytes32 _access_type) public returns (uint256, uint256){
+        return getKeyHash(toString(msg.sender), _file, _access_type);
     }
 
-    function getKeyHashSigned(bytes32 _file, bytes32 _access_type, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bytes32, uint256) {
+    function getKeyHashSigned(bytes32 _file, bytes32 _access_type, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (uint256, uint256) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _access_type, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return getKeyHash(actualSigner, _file, _access_type);
+        return getKeyHash(toString(actualSigner), _file, _access_type);
     }
 
 
-    function IndexOf(address[] memory values, address value) internal pure returns (uint) {
+    function IndexOf(string[] memory values, string memory value) internal pure returns (uint) {
         uint i = 0;
-        while (values[i] != value) {
+        while (!compareStrings(values[i], value)) {
             i++;
         }
         return i;
@@ -183,8 +205,8 @@ contract NewfangDIDRegistry {
     * @dev Update ACK hash or its validity
     * @return bool
     */
-    function updateACK(address _identity, bytes32 _file, address _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){
-        accessSpecifier[_file][_access_type][_user] = ACK(_access_key, now.add(_validity));
+    function updateACK(string memory _identity, bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){
+        accessSpecifier[_file][_access_type][_user] = ACK(_type, now.add(_validity));
         if (_validity == 0) {
             delete accessSpecifier[_file][_access_type][_user];
             uint index = IndexOf(userAccess[_file][_access_type], _user);
@@ -194,14 +216,14 @@ contract NewfangDIDRegistry {
         return true;
     }
 
-    function updateACK(bytes32 _file, address _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity) public returns (bool){
-        return updateACK(msg.sender, _file, _user, _access_type, _access_key, _validity);
+    function updateACK(bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type, uint256 _validity) public returns (bool){
+        return updateACK(toString(msg.sender), _file, _type, _user, _access_type, _validity);
     }
 
-    function updateACKSigned(bytes32 _file, address _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _access_key, _validity, nonce[signer]));
+    function updateACKSigned(bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type, uint256 _validity, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+        bytes32 payloadHash = keccak256(abi.encode(_file, _type, _user, _access_type, _validity, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return updateACK(actualSigner, _file, _user, _access_type, _access_key, _validity);
+        return updateACK(toString(actualSigner), _file, _type, _user, _access_type, _validity);
     }
 
 
@@ -210,20 +232,20 @@ contract NewfangDIDRegistry {
     * @dev Change file Owner
     * @return bool
     */
-    function changeFileOwner(address _identity, bytes32 _file, address _new_owner) internal onlyFileOwner(_file, _identity) returns (bool){
-        require(_new_owner != address(0), "Invalid address");
-        owners[_file] = _new_owner;
+    function changeFileOwner(string memory _identity, bytes32 _file, string memory _new_owner) internal onlyFileOwner(_file, _identity) returns (bool){
+        require(!compareStrings(_new_owner, "0x0000000000000000000000000000000000000000"), "Invalid address");
+        compareStrings(owners[_file], _new_owner);
         nonce[_identity]++;
         return true;
     }
 
-    function changeFileOwner(bytes32 _file, address _new_owner) public returns (bool){
-        return changeFileOwner(msg.sender, _file, _new_owner);
+    function changeFileOwner(bytes32 _file, string memory _new_owner) public returns (bool){
+        return changeFileOwner(toString(msg.sender), _file, _new_owner);
     }
 
-    function changeOwnerSigned(bytes32 _file, address _new_owner, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+    function changeOwnerSigned(bytes32 _file, string memory _new_owner, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _new_owner, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return changeFileOwner(actualSigner, _file, _new_owner);
+        return changeFileOwner(toString(actualSigner), _file, _new_owner);
     }
 }
