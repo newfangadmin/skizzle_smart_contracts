@@ -136,13 +136,13 @@ contract NewfangDIDRegistry {
         return true;
     }
 
-    //    function share(bytes32 _file, address _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity) public returns (bool){
-    //        return share(msg.sender, _file, _user, _access_type, _access_key, _validity);
-    //    }
+    function share(bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type,  uint256 _validity) public returns (bool){
+        return share(toString(msg.sender), _file, _type,_user, _access_type, _validity);
+    }
 
 
-    function shareSigned(bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type, bytes32 _access_key, uint256 _validity, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _access_key, _validity, nonce[signer]));
+    function shareSigned(bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type, uint256 _validity, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _type, _validity, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
         return share(toString(actualSigner), _file, _type,_user, _access_type, _validity);
     }
