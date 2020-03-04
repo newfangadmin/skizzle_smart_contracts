@@ -38,6 +38,8 @@ contract NewfangDIDRegistry {
         _;
     }
 
+
+
     function compareStrings(string memory a, string memory b) internal pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
@@ -126,22 +128,30 @@ contract NewfangDIDRegistry {
      contract along with its validity
     * @return bool
     */
-    function share(string memory _identity, bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){
-        require(_validity != 0, "Validity must be non zero");
-        ACK memory ack = accessSpecifier[_file][_access_type][_user];
-        require(ack.validity == 0, "Already shared with user");
-        accessSpecifier[_file][_access_type][_user] = ACK(_type, now.add(_validity));
-        userAccess[_file][_access_type].push(_user);
+    function share(string memory _identity, bytes32[] memory _files, uint256[] memory _type,string[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity) internal returns (bool){
+
+        for (uint j=0; j<_files.length; j++) {
+            bytes32 _file = _files[j];
+            for (uint i=0; i<_type.length; i++) {
+                require(compareStrings(_identity , owners[_file]));
+                require(_validity[i] != 0, "Validity must be non zero");
+                ACK memory ack = accessSpecifier[_file[i]][_access_type[i]][_user[i]];
+                require(ack.validity == 0, "Already shared with user");
+                accessSpecifier[_file[i]][_access_type[i]][_user[i]] = ACK(_type[i], now.add(_validity[i]));
+                userAccess[_file[i]][_access_type[i]].push(_user[i]);
+            }
+        }
+
         nonce[_identity]++;
         return true;
     }
 
-    function share(bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type,  uint256 _validity) public returns (bool){
+    function share(bytes32[] memory _file, uint256[] memory _type,string[] memory _user, bytes32[] memory _access_type,  uint256[] memory _validity) public returns (bool){
         return share(toString(msg.sender), _file, _type,_user, _access_type, _validity);
     }
 
 
-    function shareSigned(bytes32 _file, uint256 _type,string memory _user, bytes32 _access_type, uint256 _validity, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+    function shareSigned(bytes32[] memory _file, uint256[] memory _type,string[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity, string memory signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _type, _validity, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
         return share(toString(actualSigner), _file, _type,_user, _access_type, _validity);
