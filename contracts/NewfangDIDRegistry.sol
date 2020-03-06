@@ -119,14 +119,13 @@ contract NewfangDIDRegistry {
     function share(bytes32 _identity, bytes32[] memory _files, uint256[] memory _type,bytes32[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity) internal returns (bool){
 
         for (uint j=0; j<_files.length; j++) {
-            bytes32 _file = _files[j];
             for (uint i=0; i<_type.length; i++) {
-                require(_identity == owners[_file]);
+                require(_identity == owners[_files[j]]);
                 require(_validity[i] != 0, "Validity must be non zero");
-                ACK memory ack = accessSpecifier[_file[i]][_access_type[i]][_user[i]];
+                ACK memory ack = accessSpecifier[_files[j]][_access_type[i]][_user[i]];
                 require(ack.validity == 0, "Already shared with user");
-                accessSpecifier[_file[i]][_access_type[i]][_user[i]] = ACK(_type[i], now.add(_validity[i]));
-                userAccess[_file[i]][_access_type[i]].push(_user[i]);
+                accessSpecifier[_files[j]][_access_type[i]][_user[i]] = ACK(_type[i], now.add(_validity[i]));
+                userAccess[_files[j]][_access_type[i]].push(_user[i]);
             }
         }
 
