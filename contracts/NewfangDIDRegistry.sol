@@ -97,18 +97,18 @@ contract NewfangDIDRegistry {
         return userAccess[_file][_access_type].length;
     }
 
-    // function getAllUsers(bytes32 _file, bytes32 _access_type) public view returns (address[] memory){
-    //     address[] memory users = userAccess[_file][_access_type];
-    //     address user;
-    //     for (uint i = 0; i < users.length; i++) {
-    //         user = userAccess[_file][_access_type][i];
-    //         if (accessSpecifier[_file][_access_type][user].validity <= now) {
-    //             //                users = remove(users, i);
-    //             delete users[i];
-    //         }
-    //     }
-    //     return users;
-    // }
+    function getAllUsers(bytes32 _file, bytes32 _access_type) public view returns (bytes32[] memory){
+        bytes32[] memory users = userAccess[_file][_access_type];
+        bytes32 user;
+        for (uint i = 0; i < users.length; i++) {
+            user = userAccess[_file][_access_type][i];
+            if (accessSpecifier[_file][_access_type][user].validity <= now) {
+                //                users = remove(users, i);
+                delete users[i];
+            }
+        }
+        return users;
+    }
 
 
     /**
