@@ -123,7 +123,7 @@ contract NewfangDIDRegistry {
                 require(_identity == owners[_files[j]]);
                 require(_validity[i] != 0, "Validity must be non zero");
                 ACK memory ack = accessSpecifier[_files[j]][_access_type[i]][_user[i]];
-                require(ack.validity == 0, "Already shared with user");
+//                require(ack.validity == 0, "Already shared with user");
                 accessSpecifier[_files[j]][_access_type[i]][_user[i]] = ACK(_type[i], now.add(_validity[i]));
                 userAccess[_files[j]][_access_type[i]].push(_user[i]);
             }

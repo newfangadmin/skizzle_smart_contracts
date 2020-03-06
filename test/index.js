@@ -103,17 +103,16 @@ describe('Contract functions', async () => {
     assert.ok(array.length === 1, `Expected 1 but got ${array.length}`);
   });
 
-  // it('share file with zero validity period', async () => {
-  //   try {
-  //     let tx = await newfangDID.functions.share(IDs[0], accounts[2], AccessTypes["read"],
-  //       ethers.utils.hashMessage("asdf"), 0);
-  //     await tx.wait();
-  //     assert(false, 'Should get an error');
-  //   } catch (e) {
-  //     assert.ok(e.message.includes('revert'), e.message)
-  //   }
-  // });
-  //
+  it('share file with zero validity period', async () => {
+    try {
+      let tx = await newfangDID.functions.share([IDs[0]], [1], [hash(accounts[2])], [AccessTypes["read"]], [0]);
+      await tx.wait();
+      assert(false, 'Should get an error');
+    } catch (e) {
+      assert.ok(e.message.includes('revert'), e.message)
+    }
+  });
+
   //
   // it('share file with without owning the file', async () => {
   //   try {
