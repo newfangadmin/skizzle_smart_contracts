@@ -68,7 +68,7 @@ describe('Contract initialization, DID creation', async () => {
 
 describe('Contract functions', async () => {
   it('Share a file', async () => {
-    let tx, ACK, ids=[], types=[], users=[], accessTypes=[], validity=[];
+    let tx, ACK, ids = [], types = [], users = [], accessTypes = [], validity = [];
 
     for (let i = 2; i < 8; i++) {
       types.push(1);
@@ -114,16 +114,15 @@ describe('Contract functions', async () => {
   });
 
   //
-  // it('share file with without owning the file', async () => {
-  //   try {
-  //     let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.share(IDs[0], accounts[3], AccessTypes["read"],
-  //       ethers.utils.hashMessage("asdf"), 120);
-  //     await tx.wait();
-  //     assert(false, 'Should get an error');
-  //   } catch (e) {
-  //     assert.ok(e.message.includes('revert'), e.message)
-  //   }
-  // });
+  it('share file with without owning the file', async () => {
+    try {
+      let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.share([IDs[0]], [1], [hash(accounts[3])], [AccessTypes["read"]], [120]);
+      await tx.wait();
+      assert(false, 'Should get an error');
+    } catch (e) {
+      assert.ok(e.message.includes('revert'), e.message)
+    }
+  });
   //
   // it('Get Key hash', async () => {
   //   let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.getKeyHash(IDs[0], AccessTypes["read"]);
