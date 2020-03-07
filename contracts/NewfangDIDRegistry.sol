@@ -145,7 +145,7 @@ contract NewfangDIDRegistry {
     }
 
     function fileUpdate( bytes32 _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
-        require(owners[_file] == bytes32(0), "File does not has an owne");
+        require(owners[_file] != bytes32(0), "File does not has an owner");
         require(n > k, "n>k");
         require(file_size != 0, "Should not be 0");
         files[_file] = File(n, k, file_size, ueb);

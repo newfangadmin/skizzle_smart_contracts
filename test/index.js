@@ -172,16 +172,16 @@ describe('Contract functions', async () => {
     assert.ok(diff === 1, `Expected 1 but got ${diff}`);
   });
 
-  // it('Set File attributes', async () => {
-  //   let n = 6;
-  //   let k = 3;
-  //   let file_size = 12;
-  //   let ueb = '<UEB hash>';
-  //   let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.fileUpdate(IDs[0], n, k, file_size, ueb);
-  //   await tx.wait();
-  //   let file = (await newfangDID.functions.files(IDs[0]));
-  //   assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
-  // });
+  it('Set File attributes', async () => {
+    let n = 6;
+    let k = 3;
+    let file_size = 12;
+    let ueb = '<UEB hash>';
+    let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.fileUpdate(IDs[0], n, k, file_size, ueb);
+    await tx.wait();
+    let file = (await newfangDID.functions.files(IDs[0]));
+    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
+  });
 
 });
 
