@@ -160,7 +160,7 @@ describe('Contract functions', async () => {
     let tx = await newfangDID.connect(provider.getSigner(accounts[1])).updateACK(IDs[0], 1 ,hash(accounts[3]), AccessTypes.read, 0);
     await tx.wait();
     let tx2 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
-    console.log(tx2);
+    // console.log(tx2);
     tx1 = tx1.filter(function (element) {
       return element !== '0x0000000000000000000000000000000000000000000000000000000000000000';
     });
@@ -185,18 +185,18 @@ describe('Contract functions', async () => {
 
 });
 
-// describe('Signed Functions', async () => {
-//   it('Get Key hash Signed', async () => {
-//     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[0], AccessTypes.read, await newfangDID.functions.nonce(accounts[1])]);
-//     let payloadHash = ethers.utils.keccak256(payload);
-//     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
-//     let sig = ethers.utils.splitSignature(signature);
-//     let tx = await newfangDID.functions.getKeyHashSigned(IDs[0], AccessTypes.read, accounts[1], sig.v, sig.r, sig.s);
-//     let data = await tx.wait();
-//     let ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], accounts[1]));
-//     assert.ok(data.events[0].args[0] === ACK.encrypted_key && parseInt(data.events[0].args[1]) === parseInt(ACK.validity), "Wrong data");
-//   });
-//
+describe('Signed Functions', async () => {
+  it('Get Key hash Signed', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[0], AccessTypes.read, await newfangDID.functions.nonce(hash(accounts[1]))]);
+    let payloadHash = ethers.utils.keccak256(payload);
+    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+    let sig = ethers.utils.splitSignature(signature);
+    let tx = await newfangDID.functions.getKeyHashSigned(IDs[0], AccessTypes.read, hash(accounts[1]), sig.v, sig.r, sig.s);
+    let data = await tx.wait();
+    let ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[1])));
+    assert.ok(parseInt(data.events[0].args[0]) === parseInt(ACK._type) && parseInt(data.events[0].args[1]) === parseInt(ACK.validity), "Wrong data");
+  });
+
 //   it('Change Owner Signed', async () => {
 //     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "uint256"], [IDs[0], accounts[2], await newfangDID.functions.nonce(accounts[1])]);
 //     let payloadHash = ethers.utils.keccak256(payload);
@@ -274,4 +274,4 @@ describe('Contract functions', async () => {
 //     assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
 //   });
 //
-// });
+});
