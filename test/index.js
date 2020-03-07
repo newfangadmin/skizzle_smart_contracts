@@ -155,24 +155,23 @@ describe('Contract functions', async () => {
     assert.ok(await newfangDID.owners(IDs[0]) === hash(accounts[1]), "owner do not match");
   });
   //
-  // it('Get all users who has file access', async () => {
-  //   let tx1 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
-  //   let tx = await newfangDID.connect(provider.getSigner(accounts[1])).updateACK(IDs[0], accounts[6], AccessTypes.read,
-  //     ethers.utils.hashMessage("asdf"), 0);
-  //   await tx.wait();
-  //   let tx2 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
-  //   console.log(tx2);
-  //   tx1 = tx1.filter(function (element) {
-  //     return element !== '0x0000000000000000000000000000000000000000';
-  //   });
-  //   tx2 = tx2.filter(function (element) {
-  //     return element !== '0x0000000000000000000000000000000000000000';
-  //   });
-  //   let diff = tx1.length - tx2.length;
-  //   console.log(tx2,tx1, accounts[6]);
-  //   assert.ok(diff === 1, `Expected 1 but got ${diff}`);
-  // });
-  //
+  it('Get all users who has file access', async () => {
+    let tx1 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
+    let tx = await newfangDID.connect(provider.getSigner(accounts[1])).updateACK(IDs[0], 1 ,hash(accounts[3]), AccessTypes.read, 0);
+    await tx.wait();
+    let tx2 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
+    console.log(tx2);
+    tx1 = tx1.filter(function (element) {
+      return element !== '0x0000000000000000000000000000000000000000000000000000000000000000';
+    });
+    tx2 = tx2.filter(function (element) {
+      return element !== '0x0000000000000000000000000000000000000000000000000000000000000000';
+    });
+    let diff = tx1.length - tx2.length;
+    // console.log(tx2,tx1, hash(accounts[3]));
+    assert.ok(diff === 1, `Expected 1 but got ${diff}`);
+  });
+
   // it('Set File attributes', async () => {
   //   let n = 6;
   //   let k = 3;
