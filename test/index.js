@@ -198,13 +198,13 @@ describe('Signed Functions', async () => {
   });
 
   it('Change Owner Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[0], hash(accounts[2]), await newfangDID.functions.nonce(hash(accounts[1]))]);
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[0], ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["string"],["saurav@newfang.io"])), await newfangDID.functions.nonce(hash(accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.changeOwnerSigned(IDs[0], hash(accounts[2]), hash(accounts[1]), sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.changeOwnerSigned(IDs[0], ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["string"],["saurav@newfang.io"])), hash(accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
-    assert.ok(await newfangDID.owners(IDs[0]) === hash(accounts[2]), "owner do not match");
+    assert.ok(await newfangDID.owners(IDs[0]) === ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["string"],["saurav@newfang.io"])), "owner do not match");
   });
 
   it('Create DID Signed', async () => {
@@ -217,32 +217,44 @@ describe('Signed Functions', async () => {
     assert.ok(await newfangDID.owners(IDs[2]) === hash(accounts[1]), "owner do not match");
   });
 
-//   it('Share DID Signed', async () => {
-//     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], accounts[1], AccessTypes["read"],
-//       ethers.utils.hashMessage("asdf"), 120, await newfangDID.functions.nonce(accounts[1])]);
-//     let payloadHash = ethers.utils.keccak256(payload);
-//     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
-//     let sig = ethers.utils.splitSignature(signature);
-//     let tx = await newfangDID.functions.shareSigned(IDs[2], accounts[1], AccessTypes["read"],
-//       ethers.utils.hashMessage("asdf"), 120, accounts[1], sig.v, sig.r, sig.s);
-//     await tx.wait();
-//     let ACK = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], accounts[1]));
-//     assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
-//   });
-//
-//   it('Update ACK Signed', async () => {
-//     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], accounts[1], AccessTypes["read"],
-//       ethers.utils.hashMessage("asdf"), 10, await newfangDID.functions.nonce(accounts[1])]);
-//     let payloadHash = ethers.utils.keccak256(payload);
-//     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
-//     let sig = ethers.utils.splitSignature(signature);
-//     let tx = await newfangDID.functions.updateACKSigned(IDs[2], accounts[1], AccessTypes["read"],
-//       ethers.utils.hashMessage("asdf"), 10, accounts[1], sig.v, sig.r, sig.s);
-//     await tx.wait();
-//     let ACK = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], accounts[1]));
-//     assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
-//   });
-//
+  it('Share DID Signed', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32[]", "uint256[]", "bytes32[]", "bytes32[]", "uint256[]", "uint256"],
+      [
+        [IDs[2]],
+        [1],
+        [hash(accounts[1])],
+        [AccessTypes.read],
+        [120],
+        await newfangDID.functions.nonce(hash(accounts[1]))
+      ]);
+    // console.log(await newfangDID.owners(IDs[2]) === hash(accounts[1]));
+    let payloadHash = ethers.utils.keccak256(payload);
+    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+    let sig = ethers.utils.splitSignature(signature);
+    let tx = await newfangDID.functions.shareSigned(
+      [IDs[2]],
+      [1],
+      [hash(accounts[1])],
+      [AccessTypes.read],
+      [120],
+      hash(accounts[1]), sig.v, sig.r, sig.s);
+    await tx.wait();
+    let ACK = await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], hash(accounts[1]));
+    assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
+  });
+
+  // it('Update ACK Signed', async () => {
+  //   let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], 1,accounts[1], AccessTypes["read"], 10, await newfangDID.functions.nonce(accounts[1])]);
+  //   let payloadHash = ethers.utils.keccak256(payload);
+  //   let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+  //   let sig = ethers.utils.splitSignature(signature);
+  //   let tx = await newfangDID.functions.updateACKSigned(IDs[2], accounts[1], AccessTypes["read"],
+  //     ethers.utils.hashMessage("asdf"), 10, accounts[1], sig.v, sig.r, sig.s);
+  //   await tx.wait();
+  //   let ACK = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], accounts[1]));
+  //   assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
+  // });
+
 //   it('Revoke Signed', async () => {
 //     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], accounts[1], AccessTypes["read"],
 //       ethers.utils.hashMessage("asdf"), 0, await newfangDID.functions.nonce(accounts[1])]);

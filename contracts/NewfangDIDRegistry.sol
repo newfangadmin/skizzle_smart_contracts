@@ -139,7 +139,7 @@ contract NewfangDIDRegistry {
 
 
     function shareSigned(bytes32[] memory _file, uint256[] memory _type,bytes32[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _type, _validity, nonce[signer]));
+        bytes32 payloadHash = keccak256(abi.encode(_file, _type, _user, _access_type , _validity, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
         return share(keccak256(abi.encode(actualSigner)), _file, _type,_user, _access_type, _validity);
     }
