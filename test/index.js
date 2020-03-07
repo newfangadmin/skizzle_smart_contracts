@@ -113,7 +113,7 @@ describe('Contract functions', async () => {
     }
   });
 
-  //
+
   it('share file with without owning the file', async () => {
     try {
       let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.share([IDs[0]], [1], [hash(accounts[3])], [AccessTypes["read"]], [120]);
@@ -123,17 +123,16 @@ describe('Contract functions', async () => {
       assert.ok(e.message.includes('revert'), e.message)
     }
   });
-  //
+
   it('Get Key hash', async () => {
     let tx = await newfangDID.connect(provider.getSigner(accounts[2])).functions.getKeyHash(IDs[0], AccessTypes["read"]);
     let data = await tx.wait();
     let ACK = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[2]));
     assert.ok(parseInt(data.events[0].args[0]) === parseInt(ACK._type) && parseInt(data.events[0].args[1]) === parseInt(ACK.validity), "Wrong data");
   });
-  //
+
   // it('Update file access', async () => {
-  //   let tx = await newfangDID.functions.share(IDs[0], accounts[1], AccessTypes["read"],
-  //     ethers.utils.hashMessage("asdfasdf"), 120);
+  //   let tx = await newfangDID.functions.share([IDs[0]], [1], [hash(accounts[1])], [AccessTypes["read"]], [0]);
   //   await tx.wait();
   //   let ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], accounts[1]));
   //   assert.ok(ACK.encrypted_key === ethers.utils.hashMessage("asdfasdf"),
@@ -150,11 +149,11 @@ describe('Contract functions', async () => {
   //   }
   // });
   //
-  // it('Change File Owner', async () => {
-  //   let tx = await newfangDID.functions.changeFileOwner(IDs[0], accounts[1]);
-  //   await tx.wait();
-  //   assert.ok(await newfangDID.owners(IDs[0]) === accounts[1], "owner do not match");
-  // });
+  it('Change File Owner', async () => {
+    let tx = await newfangDID.functions.changeFileOwner(IDs[0], hash(accounts[1]));
+    await tx.wait();
+    assert.ok(await newfangDID.owners(IDs[0]) === hash(accounts[1]), "owner do not match");
+  });
   //
   // it('Get all users who has file access', async () => {
   //   let tx1 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
