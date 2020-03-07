@@ -120,7 +120,7 @@ contract NewfangDIDRegistry {
 
         for (uint j=0; j<_files.length; j++) {
             for (uint i=0; i<_type.length; i++) {
-//                require(_identity == owners[_files[j]]);
+                require(_identity == owners[_files[j]]);
                 require(_validity[i] != 0, "Validity must be non zero");
 //                ACK memory ack = accessSpecifier[_files[j]][_access_type[i]][_user[i]];
 //                require(ack.validity == 0, "Already shared with user");
