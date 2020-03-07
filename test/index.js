@@ -124,12 +124,12 @@ describe('Contract functions', async () => {
     }
   });
   //
-  // it('Get Key hash', async () => {
-  //   let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.getKeyHash(IDs[0], AccessTypes["read"]);
-  //   let ACK = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], accounts[1]);
-  //   let data = await tx.wait();
-  //   assert.ok(data.events[0].args[0] === ACK.encrypted_key && parseInt(data.events[0].args[1]) === parseInt(ACK.validity), "Wrong data");
-  // });
+  it('Get Key hash', async () => {
+    let tx = await newfangDID.connect(provider.getSigner(accounts[2])).functions.getKeyHash(IDs[0], AccessTypes["read"]);
+    let data = await tx.wait();
+    let ACK = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[2]));
+    assert.ok(parseInt(data.events[0].args[0]) === parseInt(ACK._type) && parseInt(data.events[0].args[1]) === parseInt(ACK.validity), "Wrong data");
+  });
   //
   // it('Update file access', async () => {
   //   let tx = await newfangDID.functions.share(IDs[0], accounts[1], AccessTypes["read"],
