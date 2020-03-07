@@ -207,16 +207,16 @@ describe('Signed Functions', async () => {
     assert.ok(await newfangDID.owners(IDs[0]) === hash(accounts[2]), "owner do not match");
   });
 
-  //   it('Create DID Signed', async () => {
-//     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256"], [IDs[2], await newfangDID.functions.nonce(accounts[1])]);
-//     let payloadHash = ethers.utils.keccak256(payload);
-//     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
-//     let sig = ethers.utils.splitSignature(signature);
-//     let tx = await newfangDID.functions.createDIDSigned(IDs[2], accounts[1], sig.v, sig.r, sig.s);
-//     await tx.wait();
-//     assert.ok(await newfangDID.owners(IDs[2]) === accounts[1], "owner do not match");
-//   });
-//
+  it('Create DID Signed', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256"], [IDs[2], await newfangDID.functions.nonce(hash(accounts[1]))]);
+    let payloadHash = ethers.utils.keccak256(payload);
+    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+    let sig = ethers.utils.splitSignature(signature);
+    let tx = await newfangDID.functions.createDIDSigned(IDs[2], hash(accounts[1]), sig.v, sig.r, sig.s);
+    await tx.wait();
+    assert.ok(await newfangDID.owners(IDs[2]) === hash(accounts[1]), "owner do not match");
+  });
+
 //   it('Share DID Signed', async () => {
 //     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], accounts[1], AccessTypes["read"],
 //       ethers.utils.hashMessage("asdf"), 120, await newfangDID.functions.nonce(accounts[1])]);
