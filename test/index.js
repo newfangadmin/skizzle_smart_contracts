@@ -16,8 +16,7 @@ let IDs = [
 
 function hash(address) {
   let payload = ethers.utils.defaultAbiCoder.encode(["address"], [address]);
-  let payloadHash = ethers.utils.keccak256(payload);
-  return payloadHash;
+  return ethers.utils.keccak256(payload);
 }
 
 let AccessTypes = {
