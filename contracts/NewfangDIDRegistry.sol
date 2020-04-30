@@ -53,17 +53,6 @@ contract NewfangDIDRegistry {
         return keccak256(abi.encode(_addr));
     }
 
-
-    function remove(address[] memory array, uint index) internal pure returns (address[] memory) {
-
-        for (uint i = index; i < array.length - 1; i++) {
-            array[i] = array[i + 1];
-        }
-        delete array[array.length - 1];
-        //        array.length--;
-        return array;
-    }
-
     function getSigner(bytes32 payloadHash, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public pure returns (address){
         bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", payloadHash));
         address actualSigner = ecrecover(messageHash, v, r, s);
@@ -98,8 +87,21 @@ contract NewfangDIDRegistry {
     }
 
 
-    function removeDID(bytes32 _id, bytes32 _identity) internal returns (bool){
+    function removeDID(bytes32 _id, bytes32 _identity) internal returns (bool) {
         require(owners[_id] == _identity, "Owner does not match");
+
+        // Remove access of all the users
+        bytes32[] memory users;
+        bytes32 user;
+        for (uint at = 0; at < accessTypes[_id].types.length; at++) {
+            users = userAccess[_id][accessTypes[_id].types[at]];
+            for (uint i = 0; i < users.length; i++) {
+                user = userAccess[_id][accessTypes[_id].types[at]][i];
+                delete accessSpecifier[_id][accessTypes[_id].types[at]][user];
+            }
+        }
+
+        // Remove file owner
         delete owners[_id];
         return true;
     }
@@ -125,7 +127,6 @@ contract NewfangDIDRegistry {
         for (uint i = 0; i < users.length; i++) {
             user = userAccess[_file][_access_type][i];
             if (accessSpecifier[_file][_access_type][user].validity <= now) {
-                //                users = remove(users, i);
                 delete users[i];
             }
         }
