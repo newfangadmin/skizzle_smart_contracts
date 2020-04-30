@@ -98,8 +98,12 @@ contract NewfangDIDRegistry {
             for (uint i = 0; i < users.length; i++) {
                 user = userAccess[_id][accessTypes[_id].types[at]][i];
                 delete accessSpecifier[_id][accessTypes[_id].types[at]][user];
+                delete userAccess[_id][accessTypes[_id].types[at]][i];
             }
         }
+
+        // Remove file
+        delete files[_id];
 
         // Remove file owner
         delete owners[_id];
@@ -118,7 +122,16 @@ contract NewfangDIDRegistry {
 
 
     function getTotalUsers(bytes32 _file, bytes32 _access_type) public view returns (uint256){
-        return userAccess[_file][_access_type].length;
+        bytes32[] memory users = userAccess[_file][_access_type];
+        bytes32 user;
+        uint256 count = 0;
+        for (uint i = 0; i < users.length; i++) {
+            user = userAccess[_file][_access_type][i];
+            if (user != bytes32(0) && accessSpecifier[_file][_access_type][user].validity > now) {
+                count = count.add(1);
+            }
+        }
+        return count;
     }
 
     function getAllUsers(bytes32 _file, bytes32 _access_type) public view returns (bytes32[] memory){
@@ -149,6 +162,12 @@ contract NewfangDIDRegistry {
                 //                require(ack.validity == 0, "Already shared with user");
                 accessSpecifier[_files[j]][_access_type[i]][_user[i]] = ACK(_type[i], now.add(_validity[i]));
                 userAccess[_files[j]][_access_type[i]].push(_user[i]);
+
+                if (!accessTypes[_files[j]].is_in[_access_type[i]]) {
+                    accessTypes[_files[j]].types.push(_access_type[i]);
+                    accessTypes[_files[j]].is_in[_access_type[i]] = true;
+                }
+
             }
         }
 
@@ -170,6 +189,7 @@ contract NewfangDIDRegistry {
     function fileUpdate(bytes32 _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
         require(owners[_file] != bytes32(0), "File does not has an owner");
         require(n > k, "n>k");
+        require(k > 1, "k should not be 0");
         require(file_size != 0, "Should not be 0");
         files[_file] = File(n, k, file_size, ueb);
         return true;
@@ -222,7 +242,8 @@ contract NewfangDIDRegistry {
     }
 
     /**
-    * @dev Update ACK hash or its validity
+    * @dev Update ACK type or its validity, it can not be used to change access_type, to change you have to share the
+    file again with desired access type and you may remove the previous access type
     * @return bool
     */
     function updateACK(bytes32 _identity, bytes32 _file, uint256 _type, bytes32 _user, bytes32 _access_type, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){

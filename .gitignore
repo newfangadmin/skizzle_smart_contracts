@@ -4,6 +4,7 @@ package-lock.json
 yarn.lock
 dist
 build
+tenderly.yaml
 
 # Created by https://www.gitignore.io/api/jetbrains+all
 # Edit at https://www.gitignore.io/?templates=jetbrains+all

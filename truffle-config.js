@@ -20,7 +20,7 @@ module.exports = {
 
         // Useful for private networks
         private: {
-            provider: () => new HDWalletProvider("0x591f16f823a8e6199756200625ef82fe334c868e252eb77694c3c52e50c1507f", `http://13.127.220.91:8545`),
+            provider: () => new HDWalletProvider("24C4FE6063E62710EAD956611B71825B778B041B18ED53118CE5DA5F02E494BA", `https://testnetv3.matic.network`),
             production: true,    // Treats this network as if it was a public net. (default: false)
             network_id: "*",
             gasPrice: 0,
