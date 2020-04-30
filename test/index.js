@@ -3,7 +3,7 @@ const ethers = require('ethers');
 const config = require('../config.json');
 
 const ganache = require('ganache-cli');
-const provider = new ethers.providers.Web3Provider(ganache.provider({gasLimit: 8000000}));
+const provider = new ethers.providers.Web3Provider(ganache.provider({gasLimit: 7000000}));
 
 const newfangJson = require('../build/NewfangDIDRegistry.json');
 
