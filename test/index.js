@@ -67,16 +67,15 @@ describe('Contract initialization, DID creation', async () => {
 
 describe('Contract functions', async () => {
   it('Share a file', async () => {
-    let tx, ACK, ids = [], types = [], users = [], accessTypes = [], validity = [];
+    let tx, ACK, ids = [], users = [], accessTypes = [], validity = [];
 
     for (let i = 2; i < 8; i++) {
-      types.push(1);
       users.push(hash(accounts[i]));
       accessTypes.push(AccessTypes["read"]);
       validity.push(120);
     }
 
-    tx = await newfangDID.functions.share([IDs[0]], types, users, accessTypes, validity);
+    tx = await newfangDID.functions.share([IDs[0]], users, accessTypes, validity);
     await tx.wait();
 
     // Verify the changes
@@ -104,7 +103,7 @@ describe('Contract functions', async () => {
 
   it('share file with zero validity period', async () => {
     try {
-      let tx = await newfangDID.functions.share([IDs[0]], [1], [hash(accounts[2])], [AccessTypes["read"]], [0]);
+      let tx = await newfangDID.functions.share([IDs[0]], [hash(accounts[2])], [AccessTypes["read"]], [0]);
       await tx.wait();
       assert(false, 'Should get an error');
     } catch (e) {
@@ -115,7 +114,7 @@ describe('Contract functions', async () => {
 
   it('share file with without owning the file', async () => {
     try {
-      let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.share([IDs[0]], [1], [hash(accounts[3])], [AccessTypes["read"]], [120]);
+      let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.share([IDs[0]], [hash(accounts[3])], [AccessTypes["read"]], [120]);
       await tx.wait();
       assert(false, 'Should get an error');
     } catch (e) {
@@ -156,7 +155,7 @@ describe('Contract functions', async () => {
   //
   it('Get all users who has file access', async () => {
     let tx1 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
-    let tx = await newfangDID.connect(provider.getSigner(accounts[1])).updateACK(IDs[0], 1, hash(accounts[3]), AccessTypes.read, 0);
+    let tx = await newfangDID.connect(provider.getSigner(accounts[1])).updateACK(IDs[0], hash(accounts[3]), AccessTypes.read, 0);
     await tx.wait();
     let tx2 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
     // console.log(tx2);
@@ -186,7 +185,7 @@ describe('Contract functions', async () => {
     let did_tx = await newfangDID.createDID(IDs[1]);
     await did_tx.wait();
 
-    let share_tx1 = await newfangDID.functions.share([IDs[1]], [1], [hash(accounts[2])], [AccessTypes.read], [1200]);
+    let share_tx1 = await newfangDID.functions.share([IDs[1]], [hash(accounts[2])], [AccessTypes.read], [1200]);
     await share_tx1.wait();
 
 
@@ -237,10 +236,9 @@ describe('Signed Functions', async () => {
   });
 
   it('Share DID Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32[]", "uint256[]", "bytes32[]", "bytes32[]", "uint256[]", "uint256"],
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32[]", "bytes32[]", "bytes32[]", "uint256[]", "uint256"],
       [
         [IDs[2]],
-        [1],
         [hash(accounts[1])],
         [AccessTypes.read],
         [120],
@@ -252,7 +250,6 @@ describe('Signed Functions', async () => {
     let sig = ethers.utils.splitSignature(signature);
     let tx = await newfangDID.functions.shareSigned(
       [IDs[2]],
-      [1],
       [hash(accounts[1])],
       [AccessTypes.read],
       [120],
@@ -262,23 +259,23 @@ describe('Signed Functions', async () => {
     assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
   });
 
-  it('Update ACK Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], 1, hash(accounts[1]), AccessTypes["read"], 10, await newfangDID.functions.nonce(hash(accounts[1]))]);
+  it('Update ACK Signed with non zero validity', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], hash(accounts[1]), AccessTypes["read"], 10, await newfangDID.functions.nonce(hash(accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.updateACKSigned(IDs[2], 1, hash(accounts[1]), AccessTypes["read"], 10, hash(accounts[1]), sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.updateACKSigned(IDs[2], hash(accounts[1]), AccessTypes["read"], 10, hash(accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     let ACK = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], hash(accounts[1])));
     assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
   });
 
-  it('Update ACK Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], 1, hash(accounts[1]), AccessTypes["read"], 0, await newfangDID.functions.nonce(hash(accounts[1]))]);
+  it('Update ACK Signed with zero validity', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], hash(accounts[1]), AccessTypes["read"], 0, await newfangDID.functions.nonce(hash(accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.updateACKSigned(IDs[2], 1, hash(accounts[1]), AccessTypes["read"], 0, hash(accounts[1]), sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.updateACKSigned(IDs[2], hash(accounts[1]), AccessTypes["read"], 0, hash(accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], hash(accounts[1])));
     assert.ok(parseInt(validity) === 0, "Validity can not be 0")

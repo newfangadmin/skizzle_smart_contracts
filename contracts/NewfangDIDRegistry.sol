@@ -151,9 +151,9 @@ contract NewfangDIDRegistry {
      contract along with its validity
     * @return bool
     */
-    function share(bytes32 _identity, bytes32[] memory _files, uint256[] memory _type, bytes32[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity) internal returns (bool){
+    function share(bytes32 _identity, bytes32[] memory _files, bytes32[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity) internal returns (bool){
         for (uint j = 0; j < _files.length; j++) {
-            for (uint i = 0; i < _type.length; i++) {
+            for (uint i = 0; i < _user.length; i++) {
                 require(_identity == owners[_files[j]]);
                 require(_validity[i] != 0, "Validity must be non zero");
                 //                ACK memory ack = accessSpecifier[_files[j]][_access_type[i]][_user[i]];
@@ -173,15 +173,15 @@ contract NewfangDIDRegistry {
         return true;
     }
 
-    function share(bytes32[] memory _file, uint256[] memory _type, bytes32[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity) public returns (bool){
-        return share(keccak256(abi.encode(msg.sender)), _file, _type, _user, _access_type, _validity);
+    function share(bytes32[] memory _file, bytes32[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity) public returns (bool){
+        return share(keccak256(abi.encode(msg.sender)), _file, _user, _access_type, _validity);
     }
 
 
-    function shareSigned(bytes32[] memory _file, uint256[] memory _type, bytes32[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _type, _user, _access_type, _validity, nonce[signer]));
+    function shareSigned(bytes32[] memory _file, bytes32[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _validity, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return share(keccak256(abi.encode(actualSigner)), _file, _type, _user, _access_type, _validity);
+        return share(keccak256(abi.encode(actualSigner)), _file, _user, _access_type, _validity);
     }
 
     function fileUpdate(bytes32 _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
@@ -244,7 +244,7 @@ contract NewfangDIDRegistry {
     file again with desired access type and you may remove the previous access type
     * @return bool
     */
-    function updateACK(bytes32 _identity, bytes32 _file, uint256 _type, bytes32 _user, bytes32 _access_type, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){
+    function updateACK(bytes32 _identity, bytes32 _file, bytes32 _user, bytes32 _access_type, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){
         accessSpecifier[_file][_access_type][_user] = now.add(_validity);
         if (_validity == 0) {
             delete accessSpecifier[_file][_access_type][_user];
@@ -260,14 +260,14 @@ contract NewfangDIDRegistry {
         return true;
     }
 
-    function updateACK(bytes32 _file, uint256 _type, bytes32 _user, bytes32 _access_type, uint256 _validity) public returns (bool){
-        return updateACK(hash(msg.sender), _file, _type, _user, _access_type, _validity);
+    function updateACK(bytes32 _file, bytes32 _user, bytes32 _access_type, uint256 _validity) public returns (bool){
+        return updateACK(hash(msg.sender), _file, _user, _access_type, _validity);
     }
 
-    function updateACKSigned(bytes32 _file, uint256 _type, bytes32 _user, bytes32 _access_type, uint256 _validity, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _type, _user, _access_type, _validity, nonce[signer]));
+    function updateACKSigned(bytes32 _file, bytes32 _user, bytes32 _access_type, uint256 _validity, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _validity, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return updateACK(hash(actualSigner), _file, _type, _user, _access_type, _validity);
+        return updateACK(hash(actualSigner), _file, _user, _access_type, _validity);
     }
 
 
