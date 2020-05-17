@@ -1,4 +1,5 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
+const config = require('./config');
 
 module.exports = {
 
@@ -20,10 +21,10 @@ module.exports = {
 
         // Useful for private networks
         private: {
-            provider: () => new HDWalletProvider("24C4FE6063E62710EAD956611B71825B778B041B18ED53118CE5DA5F02E494BA", `https://testnetv3.matic.network`),
+            provider: () => new HDWalletProvider(config.private_key, `https://alpha.ethereum.matic.network`),
             production: true,    // Treats this network as if it was a public net. (default: false)
             network_id: "*",
-            gasPrice: 0,
+            gasPrice: '0x0',
             skipDryRun: true
         }
     },

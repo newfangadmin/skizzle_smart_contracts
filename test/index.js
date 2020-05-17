@@ -126,8 +126,8 @@ describe('Contract functions', async () => {
   it('Get Key hash', async () => {
     let tx = await newfangDID.connect(provider.getSigner(accounts[2])).functions.getKeyHash(IDs[0], AccessTypes["read"]);
     let data = await tx.wait();
-    let ACK = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[2]));
-    assert.ok(parseInt(data.events[0].args[0]) === parseInt(ACK._type) && parseInt(data.events[0].args[1]) === parseInt(ACK.validity), "Wrong data");
+    let validity = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[2]));
+    assert.ok(parseInt(data.events[0].args[1]) === parseInt(validity), "Wrong data");
   });
 
   // it('Update file access', async () => {
@@ -212,8 +212,8 @@ describe('Signed Functions', async () => {
     let sig = ethers.utils.splitSignature(signature);
     let tx = await newfangDID.functions.getKeyHashSigned(IDs[0], AccessTypes.read, hash(accounts[1]), sig.v, sig.r, sig.s);
     let data = await tx.wait();
-    let ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[1])));
-    assert.ok(parseInt(data.events[0].args[0]) === parseInt(ACK._type) && parseInt(data.events[0].args[1]) === parseInt(ACK.validity), "Wrong data");
+    let validity = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[1])));
+    assert.ok(parseInt(data.events[0].args[1]) === parseInt(validity), "Wrong data");
   });
 
   it('Change Owner Signed', async () => {
@@ -280,8 +280,8 @@ describe('Signed Functions', async () => {
     let sig = ethers.utils.splitSignature(signature);
     let tx = await newfangDID.functions.updateACKSigned(IDs[2], 1, hash(accounts[1]), AccessTypes["read"], 0, hash(accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
-    let ACK = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], hash(accounts[1])));
-    assert.ok(parseInt(ACK.validity) === 0, "Validity can not be 0")
+    let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], hash(accounts[1])));
+    assert.ok(parseInt(validity) === 0, "Validity can not be 0")
   });
 
 

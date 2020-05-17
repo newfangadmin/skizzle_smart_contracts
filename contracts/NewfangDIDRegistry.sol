@@ -6,16 +6,19 @@ contract NewfangDIDRegistry {
     using SafeMath for uint;
     bytes32 public log;
 
+
     // keccak256(storage index) => bytes32 newfang-specific-idstring
     mapping(bytes32 => bytes32) public owners; // file owners
     // file id => access type => user => access control key
-    mapping(bytes32 => mapping(bytes32 => mapping(bytes32 => ACK))) public accessSpecifier;
+    mapping(bytes32 => mapping(bytes32 => mapping(bytes32 => uint256))) public accessSpecifier;
+    // It is used to get all users of a particular type with particular access
     mapping(bytes32 => mapping(bytes32 => bytes32[])) public userAccess;
     mapping(bytes32 => uint) public nonce;
     mapping(bytes32 => File) public files;
     mapping(bytes32 => Access) accessTypes;
     address public owner;
 
+    // similar to sets
     struct Access {
         bytes32[] types;
         mapping(bytes32 => bool) is_in;
@@ -26,11 +29,6 @@ contract NewfangDIDRegistry {
         uint256 k;
         uint256 file_size;
         string ueb;
-    }
-
-    struct ACK {// Access Control Key
-        uint256 _type; // type of access email or public key
-        uint256 validity;
     }
 
     constructor () public {
@@ -101,6 +99,7 @@ contract NewfangDIDRegistry {
                 delete userAccess[_id][accessTypes[_id].types[at]][i];
             }
         }
+        // end remove access of all users
 
         // Remove file
         delete files[_id];
@@ -127,7 +126,7 @@ contract NewfangDIDRegistry {
         uint256 count = 0;
         for (uint i = 0; i < users.length; i++) {
             user = userAccess[_file][_access_type][i];
-            if (user != bytes32(0) && accessSpecifier[_file][_access_type][user].validity > now) {
+            if (user != bytes32(0) && accessSpecifier[_file][_access_type][user] > now) {
                 count = count.add(1);
             }
         }
@@ -139,7 +138,7 @@ contract NewfangDIDRegistry {
         bytes32 user;
         for (uint i = 0; i < users.length; i++) {
             user = userAccess[_file][_access_type][i];
-            if (accessSpecifier[_file][_access_type][user].validity <= now) {
+            if (accessSpecifier[_file][_access_type][user] <= now) {
                 delete users[i];
             }
         }
@@ -153,14 +152,13 @@ contract NewfangDIDRegistry {
     * @return bool
     */
     function share(bytes32 _identity, bytes32[] memory _files, uint256[] memory _type, bytes32[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity) internal returns (bool){
-
         for (uint j = 0; j < _files.length; j++) {
             for (uint i = 0; i < _type.length; i++) {
                 require(_identity == owners[_files[j]]);
                 require(_validity[i] != 0, "Validity must be non zero");
                 //                ACK memory ack = accessSpecifier[_files[j]][_access_type[i]][_user[i]];
-                //                require(ack.validity == 0, "Already shared with user");
-                accessSpecifier[_files[j]][_access_type[i]][_user[i]] = ACK(_type[i], now.add(_validity[i]));
+                //                require(ack == 0, "Already shared with user");
+                accessSpecifier[_files[j]][_access_type[i]][_user[i]] = now.add(_validity[i]);
                 userAccess[_files[j]][_access_type[i]].push(_user[i]);
 
                 if (!accessTypes[_files[j]].is_in[_access_type[i]]) {
@@ -206,15 +204,15 @@ contract NewfangDIDRegistry {
     }
 
     event KeyHash(
-        uint256 _type,
+        bytes32 user,
         uint256 validity
     );
 
-    function getKeyHash(bytes32 _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256, uint256){
-        ACK memory ack = accessSpecifier[_file][_access_type][_identity];
+    function getKeyHash(bytes32 _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256){
+        uint256 validity = accessSpecifier[_file][_access_type][_identity];
         nonce[_identity]++;
-        emit KeyHash(ack._type, ack.validity);
-        return (ack._type, ack.validity);
+        emit KeyHash(_identity, validity);
+        return (validity);
     }
 
 
@@ -222,11 +220,11 @@ contract NewfangDIDRegistry {
     * @dev Fetch ACK hash of user
     * @return encrypted hash and validity
     */
-    function getKeyHash(bytes32 _file, bytes32 _access_type) public returns (uint256, uint256){
+    function getKeyHash(bytes32 _file, bytes32 _access_type) public returns (uint256){
         return getKeyHash(hash(msg.sender), _file, _access_type);
     }
 
-    function getKeyHashSigned(bytes32 _file, bytes32 _access_type, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (uint256, uint256) {
+    function getKeyHashSigned(bytes32 _file, bytes32 _access_type, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (uint256) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _access_type, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
         return getKeyHash(hash(actualSigner), _file, _access_type);
@@ -242,19 +240,20 @@ contract NewfangDIDRegistry {
     }
 
     /**
-    * @dev Update ACK type or its validity, it can not be used to change access_type, to change you have to share the
+    * @dev Update ACK(Access Control Key) validity, it can not be used to change access_type, to change you have to share the
     file again with desired access type and you may remove the previous access type
     * @return bool
     */
     function updateACK(bytes32 _identity, bytes32 _file, uint256 _type, bytes32 _user, bytes32 _access_type, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){
-        accessSpecifier[_file][_access_type][_user] = ACK(_type, now.add(_validity));
+        accessSpecifier[_file][_access_type][_user] = now.add(_validity);
         if (_validity == 0) {
             delete accessSpecifier[_file][_access_type][_user];
             uint index = IndexOf(userAccess[_file][_access_type], _user);
             delete userAccess[_file][_access_type][index];
         }
-        if (!accessTypes[_file].is_in[_access_type]) {
+        if (!accessTypes[_file].is_in[_access_type]) {// check if access type is already declared
             accessTypes[_file].types.push(_access_type);
+            // push the new access type
             accessTypes[_file].is_in[_access_type] = true;
         }
         nonce[_identity]++;
