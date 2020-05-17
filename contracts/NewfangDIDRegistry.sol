@@ -8,7 +8,7 @@ contract NewfangDIDRegistry {
 
 
     // keccak256(storage index) => bytes32 newfang-specific-idstring
-    mapping(bytes32 => bytes32) public owners; // file owners
+    mapping(bytes32 => address) public owners; // file owners
     // file id => access type => user => access control key
     mapping(bytes32 => mapping(bytes32 => mapping(bytes32 => uint256))) public accessSpecifier;
     // It is used to get all users of a particular type with particular access
@@ -46,10 +46,6 @@ contract NewfangDIDRegistry {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
 
-
-    function hash(address _addr) public pure returns (bytes32) {
-        return keccak256(abi.encode(_addr));
-    }
 
     function getSigner(bytes32 payloadHash, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public pure returns (address){
         bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", payloadHash));
@@ -204,7 +200,7 @@ contract NewfangDIDRegistry {
     }
 
     event KeyHash(
-        bytes32 user,
+        address user,
         uint256 validity
     );
 
@@ -221,13 +217,13 @@ contract NewfangDIDRegistry {
     * @return encrypted hash and validity
     */
     function getKeyHash(bytes32 _file, bytes32 _access_type) public returns (uint256){
-        return getKeyHash(hash(msg.sender), _file, _access_type);
+        return getKeyHash(msg.sender, _file, _access_type);
     }
 
     function getKeyHashSigned(bytes32 _file, bytes32 _access_type, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (uint256) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _access_type, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return getKeyHash(hash(actualSigner), _file, _access_type);
+        return getKeyHash(actualSigner, _file, _access_type);
     }
 
 
@@ -261,13 +257,13 @@ contract NewfangDIDRegistry {
     }
 
     function updateACK(bytes32 _file, bytes32 _user, bytes32 _access_type, uint256 _validity) public returns (bool){
-        return updateACK(hash(msg.sender), _file, _user, _access_type, _validity);
+        return updateACK(msg.sender, _file, _user, _access_type, _validity);
     }
 
     function updateACKSigned(bytes32 _file, bytes32 _user, bytes32 _access_type, uint256 _validity, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _validity, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return updateACK(hash(actualSigner), _file, _user, _access_type, _validity);
+        return updateACK(actualSigner, _file, _user, _access_type, _validity);
     }
 
 
@@ -284,12 +280,12 @@ contract NewfangDIDRegistry {
     }
 
     function changeFileOwner(bytes32 _file, bytes32 _new_owner) public returns (bool){
-        return changeFileOwner(hash(msg.sender), _file, _new_owner);
+        return changeFileOwner(msg.sender, _file, _new_owner);
     }
 
     function changeOwnerSigned(bytes32 _file, bytes32 _new_owner, bytes32 signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _new_owner, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return changeFileOwner(hash(actualSigner), _file, _new_owner);
+        return changeFileOwner(actualSigner, _file, _new_owner);
     }
 }
