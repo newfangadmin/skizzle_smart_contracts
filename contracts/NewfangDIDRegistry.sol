@@ -16,6 +16,7 @@ contract NewfangDIDRegistry {
     mapping(address => uint) public nonce;
     mapping(bytes32 => File) public files;
     mapping(bytes32 => Access) accessTypes;
+    mapping(address => Usage[]) usages;
     address public owner;
 
     // similar to sets
@@ -29,6 +30,12 @@ contract NewfangDIDRegistry {
         uint256 k;
         uint256 file_size;
         string ueb;
+    }
+
+    struct Usage {
+        uint256 total_bytes;
+        uint256 usage_type; // 0 => upload; 1 => download
+        bytes32 file;
     }
 
     constructor () public {
@@ -102,6 +109,8 @@ contract NewfangDIDRegistry {
 
         // Remove file owner
         delete owners[_id];
+
+        nonce[_identity]++;
         return true;
     }
 
@@ -186,6 +195,7 @@ contract NewfangDIDRegistry {
         require(k > 1, "k should not be 0");
         require(file_size != 0, "Should not be 0");
         files[_file] = File(n, k, file_size, ueb);
+        nonce[_identity]++;
         return true;
     }
 
@@ -288,4 +298,22 @@ contract NewfangDIDRegistry {
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
         return changeFileOwner(actualSigner, _file, _new_owner);
     }
+
+    function updateUsage(address _identity, uint256 _total_bytes, uint256 _type, bytes32 _file) internal {
+        Usage memory usage = Usage(_total_bytes, _type, _file);
+        usages[_identity].push(usage);
+        nonce[_identity]++;
+    }
+
+    function updateUsage(uint256 _total_bytes, uint256 _type, bytes32 _file) public {
+        updateUsage(msg.sender, _total_bytes, _type, _file);
+    }
+
+
+    function updateUsageSigned(uint256 _total_bytes, uint256 _type, bytes32 _file, address signer, uint8 v, bytes32 r, bytes32 s) public {
+        bytes32 payloadHash = keccak256(abi.encode(_total_bytes, _type, _file,nonce[signer]));
+        address actualSigner = getSigner(payloadHash, signer, v, r, s);
+        updateUsage(actualSigner, _total_bytes, _type, _file);
+    }
+
 }

@@ -1,4 +1,5 @@
 # Newfang DID Method Specification
+[![Build Status](https://travis-ci.com/newfangadmin/skizzle_smart_contracts.svg?token=2yjAythLGDwdY1XXtyDa&branch=dev)](https://travis-ci.com/newfangadmin/skizzle_smart_contracts)
 
 # Abstract
 Newfang is a decentralized cloud storage platform with a modular decentralized access control layer that can plug into any underlying storage. The intention at Newfang is to give users back real ownership and control of their files. We hope to do this by giving every file, uploaded to Newfang, a unique, globally resolvable and decentralized id.
