@@ -299,21 +299,21 @@ contract NewfangDIDRegistry {
         return changeFileOwner(actualSigner, _file, _new_owner);
     }
 
-    function updateUsage(address _identity, uint256 _total_bytes, uint256 _type, bytes32 _file) internal {
+    function addUsage(address _identity, uint256 _total_bytes, uint256 _type, bytes32 _file) internal {
         Usage memory usage = Usage(_total_bytes, _type, _file);
         usages[_identity].push(usage);
         nonce[_identity]++;
     }
 
-    function updateUsage(uint256 _total_bytes, uint256 _type, bytes32 _file) public {
-        updateUsage(msg.sender, _total_bytes, _type, _file);
+    function addUsage(uint256 _total_bytes, uint256 _type, bytes32 _file) public {
+        addUsage(msg.sender, _total_bytes, _type, _file);
     }
 
 
-    function updateUsageSigned(uint256 _total_bytes, uint256 _type, bytes32 _file, address signer, uint8 v, bytes32 r, bytes32 s) public {
+    function addUsageSigned(uint256 _total_bytes, uint256 _type, bytes32 _file, address signer, uint8 v, bytes32 r, bytes32 s) public {
         bytes32 payloadHash = keccak256(abi.encode(_total_bytes, _type, _file,nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        updateUsage(actualSigner, _total_bytes, _type, _file);
+        addUsage(actualSigner, _total_bytes, _type, _file);
     }
 
 }

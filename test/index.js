@@ -197,6 +197,13 @@ describe('Contract functions', async () => {
   });
 
 
+  // it('Update Usage', async () => {
+  //   let tx = await newfangDID.functions.createDID(IDs[0]);
+  //   await tx.wait();
+  //   assert.ok(await newfangDID.functions.owners(IDs[0]) === (await wallet.getAddress()),
+  //     "Owner should be the person who calls the function");
+  // });
+
 });
 
 describe('Signed Functions', async () => {
