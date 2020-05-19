@@ -7,7 +7,7 @@ contract NewfangDIDRegistry {
     bytes32 public log;
 
 
-    // keccak256(storage index) => bytes32 newfang-specific-idstring
+    // keccak256(storage index) => bytes32 newfang-specific-idbytes
     mapping(bytes32 => address) public owners; // file owners
     // file id => access type => user => access control key
     mapping(bytes32 => mapping(bytes32 => mapping(address => uint256))) public accessSpecifier;
@@ -29,7 +29,7 @@ contract NewfangDIDRegistry {
         uint256 n;
         uint256 k;
         uint256 file_size;
-        string ueb;
+        bytes ueb;
     }
 
     struct Usage {
@@ -45,12 +45,6 @@ contract NewfangDIDRegistry {
     modifier onlyFileOwner(bytes32 _file, address _identity) {
         require(_identity == owners[_file]);
         _;
-    }
-
-
-
-    function compareStrings(string memory a, string memory b) internal pure returns (bool) {
-        return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
     }
 
 
@@ -202,10 +196,10 @@ contract NewfangDIDRegistry {
         uint256 n,
         uint256 k,
         uint256 file_size,
-        string ueb
+        bytes ueb
     );
 
-    function fileUpdate(address _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
+    function fileUpdate(address _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
         require(owners[_file] != address(0), "File does not has an owner");
         require(n > k, "n>k");
         require(k > 1, "k should not be 0");
@@ -216,11 +210,11 @@ contract NewfangDIDRegistry {
         return true;
     }
 
-    function fileUpdate(bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb) public returns (bool){
+    function fileUpdate(bytes32 _file, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) public returns (bool){
         return fileUpdate(msg.sender, _file, n, k, file_size, ueb);
     }
 
-    function fileUpdateSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool){
+    function fileUpdateSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, bytes memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool){
         bytes32 payloadHash = keccak256(abi.encode(_file, n, k, file_size, ueb, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
         return fileUpdate(actualSigner, _file, n, k, file_size, ueb);
@@ -321,17 +315,17 @@ contract NewfangDIDRegistry {
     /**
     * @dev this function is the combination of createDID, fileUpdate
     */
-    function email(address _identity, bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal {
+    function email(address _identity, bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) internal {
         createDID(_file_id, _identity);
         fileUpdate(_identity, _file_id, n, k, file_size, ueb);
     }
 
-    function email(bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, string memory ueb) public {
+    function email(bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) public {
         createDID(_file_id, msg.sender);
         fileUpdate(msg.sender, _file_id, n, k, file_size, ueb);
     }
 
-    function emailSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public {
+    function emailSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, bytes memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public {
         bytes32 payloadHash = keccak256(abi.encode(_file, n, k, file_size, ueb, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
         email(actualSigner, _file, n, k, file_size, ueb);

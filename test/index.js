@@ -153,11 +153,12 @@ describe('Contract functions', async () => {
     let n = 6;
     let k = 3;
     let file_size = 12;
-    let ueb = '<UEB hash>';
+    let ueb_string = '<UEB hash>';
+    let ueb = ethers.utils.toUtf8Bytes(ueb_string);
     let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.fileUpdate(IDs[0], n, k, file_size, ueb);
     await tx.wait();
     let file = (await newfangDID.functions.files(IDs[0]));
-    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
+    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && ethers.utils.toUtf8String(file.ueb) === ueb_string, "File attributes don't match");
   });
 
   it('Remove DID', async () => {
@@ -183,13 +184,14 @@ describe('Contract functions', async () => {
     let n = 6;
     let k = 3;
     let file_size = 12;
-    let ueb = '<UEB hash>';
+    let ueb_string = '<UEB hash>';
+    let ueb = ethers.utils.toUtf8Bytes(ueb_string);
 
-    let did_tx = await newfangDID.email(IDs[1],n,k, file_size, ueb);
+    let did_tx = await newfangDID.email(IDs[1], n, k, file_size, ueb);
     await did_tx.wait();
     let file = (await newfangDID.functions.files(IDs[1]));
     assert.ok(await newfangDID.functions.owners(IDs[1]) === (await wallet.getAddress()), "Owner does not match");
-    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
+    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && ethers.utils.toUtf8String(file.ueb) === ueb_string, "File attributes don't match");
   });
 
 });
@@ -272,14 +274,33 @@ describe('Signed Functions', async () => {
     assert.ok(parseInt(validity) === 0, "Validity can not be 0")
   });
 
+  it('Set File attributes Signed', async () => {
+    let n = 16;
+    let k = 13;
+    let file_size = 22;
+    let ueb_string = '<UEB hash>';
+    let ueb = ethers.utils.toUtf8Bytes(ueb_string);
+
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "bytes", "uint256"], [IDs[2], n, k, file_size, ueb, await newfangDID.functions.nonce(accounts[1])]);
+    let payloadHash = ethers.utils.keccak256(payload);
+    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+    let sig = ethers.utils.splitSignature(signature);
+    let tx = await newfangDID.functions.fileUpdateSigned(IDs[2], n, k, file_size, ueb, accounts[1], sig.v, sig.r, sig.s);
+    await tx.wait();
+
+    let file = (await newfangDID.functions.files(IDs[2]));
+    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && ethers.utils.toUtf8String(file.ueb) === ueb_string, "File attributes don't match");
+  });
+
 
   it('Email Signed', async () => {
     let n = 16;
     let k = 13;
     let file_size = 22;
-    let ueb = '<UEB hash>';
+    let ueb_string = '<UEB hash>';
+    let ueb = ethers.utils.toUtf8Bytes(ueb_string);
 
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "string", "uint256"], [IDs[3], n, k, file_size, ueb, await newfangDID.functions.nonce((accounts[1]))]);
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "bytes", "uint256"], [IDs[3], n, k, file_size, ueb, await newfangDID.functions.nonce((accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
@@ -288,7 +309,7 @@ describe('Signed Functions', async () => {
 
     let file = (await newfangDID.functions.files(IDs[3]));
     assert.ok(await newfangDID.functions.owners(IDs[3]) === accounts[1], "Owner does not match");
-    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
+    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && ethers.utils.toUtf8String(file.ueb) === ueb_string, "File attributes don't match");
   });
 
 
