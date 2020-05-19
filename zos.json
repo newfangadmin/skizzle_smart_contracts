@@ -1,0 +1,15 @@
+{
+  "zosversion": "2.2",
+  "contracts": {
+    "NewfangDIDRegistry": "NewfangDIDRegistryV2"
+  },
+  "dependencies": {},
+  "name": ".",
+  "version": "1.0.0",
+  "compiler": {
+    "manager": "truffle",
+    "compilerSettings": {
+      "optimizer": {}
+    }
+  }
+}

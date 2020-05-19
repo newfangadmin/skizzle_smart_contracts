@@ -32,6 +32,8 @@
     "solc": "^0.5.14",
     "solc-import": "0.0.2",
     "truffle-hdwallet-provider": "^1.0.17",
-    "web3": "^1.2.2"
+    "web3": "^1.2.2",
+    "zos": "^2.4.3",
+    "zos-lib": "^2.4.3"
   }
 }
