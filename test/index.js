@@ -125,24 +125,6 @@ describe('Contract functions', async () => {
     assert.ok(parseInt(data.events[0].args[1]) === parseInt(validity), "Wrong data");
   });
 
-  // it('Update file access', async () => {
-  //   let tx = await newfangDID.functions.share([IDs[0]], [1], [(accounts[1])], [AccessTypes["read"]], [0]);
-  //   await tx.wait();
-  //   let ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], accounts[1]));
-  //   assert.ok(ACK.encrypted_key === ethers.utils.hashMessage("asdfasdf"),
-  //     "encrypted key's hash not updated");
-  // });
-  //
-  // it('Share same file to same user', async () => {
-  //   try {
-  //     let tx = await newfangDID.functions.share(IDs[0], accounts[1], AccessTypes["read"],
-  //       ethers.utils.hashMessage("asdfasdf"), 120);
-  //     await tx.wait();
-  //   } catch (e) {
-  //     assert.ok(e.message.includes('revert'), e.message)
-  //   }
-  // });
-  //
   it('Change File Owner', async () => {
     let tx = await newfangDID.functions.changeFileOwner(IDs[0], (accounts[1]));
     await tx.wait();
@@ -194,6 +176,19 @@ describe('Contract functions', async () => {
     assert.ok(parseInt((await newfangDID.files(IDs[1])).k) === 0, "File still exist on blockchain");
     assert.ok(await newfangDID.owners(IDs[1]) === "0x0000000000000000000000000000000000000000", "owner still exist");
 
+  });
+
+  it('Email(createDID + fileUpdate)', async () => {
+    let n = 6;
+    let k = 3;
+    let file_size = 12;
+    let ueb = '<UEB hash>';
+
+    let did_tx = await newfangDID.email(IDs[1],n,k, file_size, ueb);
+    await did_tx.wait();
+    let file = (await newfangDID.functions.files(IDs[1]));
+    assert.ok(await newfangDID.functions.owners(IDs[1]) === (await wallet.getAddress()), "Owner does not match");
+    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
   });
 
 });

@@ -326,4 +326,9 @@ contract NewfangDIDRegistry {
         createDID(_file_id, _identity);
         fileUpdate(_identity, _file_id, n, k, file_size, ueb);
     }
+
+    function email(bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, string memory ueb) public {
+        createDID(_file_id, msg.sender);
+        fileUpdate(msg.sender, _file_id, n, k, file_size, ueb);
+    }
 }
