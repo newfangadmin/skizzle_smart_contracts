@@ -17,7 +17,6 @@ contract NewfangDIDRegistry {
     mapping(bytes32 => File) public files;
     mapping(bytes32 => Access) accessTypes;
     mapping(address => Usage[]) usages;
-    address public owner;
 
     // similar to sets
     struct Access {
@@ -36,10 +35,6 @@ contract NewfangDIDRegistry {
         uint256 total_bytes;
         bytes32 usage_type; // 0 => upload; 1 => download
         bytes32 file;
-    }
-
-    constructor () public {
-        owner = msg.sender;
     }
 
     modifier onlyFileOwner(bytes32 _file, address _identity) {
