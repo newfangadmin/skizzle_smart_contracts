@@ -2,7 +2,7 @@ pragma solidity ^0.5;
 
 import './SafeMath.sol';
 
-import "zos-lib/contracts/Initializable.sol";
+import "./Initializable.sol";
 
 contract NewfangDIDRegistry is Initializable {
     using SafeMath for uint;
@@ -316,10 +316,10 @@ contract NewfangDIDRegistry is Initializable {
         fileUpdate(_identity, _file_id, n, k, file_size, ueb);
     }
 
-//    function email(bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) public {
-//        createDID(_file_id, msg.sender);
-//        fileUpdate(msg.sender, _file_id, n, k, file_size, ueb);
-//    }
+    function email(bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) public {
+        createDID(_file_id, msg.sender);
+        fileUpdate(msg.sender, _file_id, n, k, file_size, ueb);
+    }
 
     function emailSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, bytes memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public {
         bytes32 payloadHash = keccak256(abi.encode(_file, n, k, file_size, ueb, nonce[signer]));

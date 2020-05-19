@@ -28,4 +28,8 @@ module.exports = {
       skipDryRun: true
     }
   },
+  mocha: {
+    enableTimeouts: false,
+    before_timeout: 120000000 // Here is 2min but can be whatever timeout is suitable for you.
+  }
 };

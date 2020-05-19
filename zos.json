@@ -1,11 +1,11 @@
 {
   "zosversion": "2.2",
   "contracts": {
-    "NewfangDIDRegistry": "NewfangDIDRegistryV2"
+    "NewfangDIDRegistry": "NewfangDIDRegistry"
   },
   "dependencies": {},
   "name": ".",
-  "version": "1.0.0",
+  "version": "skizzle_smart_contracts",
   "compiler": {
     "manager": "truffle",
     "compilerSettings": {

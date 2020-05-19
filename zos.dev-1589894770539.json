@@ -1,7 +1,7 @@
 {
   "contracts": {
     "NewfangDIDRegistry": {
-      "address": "0x0906E8Df096bf13fB1e0DEC1D090490465354dF8",
+      "address": "0xef2A3591f8FB2d8361D05F224bfc89658ADbB0F2",
       "constructorCode": "608060405234801561001057600080fd5b50613a8d806100206000396000f3fe",
       "bodyBytecodeHash": "77920fed1b2c23a73b25d4a607b5e729e166f1cb11d6a65fc59ade5ea4c6e2d4",
       "localBytecodeHash": "bb37fbe94a3cc5738a4f734a576e8608103da400c91fd8037e55ddb6a6d1df3b",
@@ -66,27 +66,27 @@
           "members": [
             {
               "label": "n",
-              "astId": 93,
+              "astId": 162,
               "type": "t_uint256",
-              "src": "947:9:1"
+              "src": "931:9:2"
             },
             {
               "label": "k",
-              "astId": 95,
+              "astId": 164,
               "type": "t_uint256",
-              "src": "966:9:1"
+              "src": "950:9:2"
             },
             {
               "label": "file_size",
-              "astId": 97,
+              "astId": 166,
               "type": "t_uint256",
-              "src": "985:17:1"
+              "src": "969:17:2"
             },
             {
               "label": "ueb",
-              "astId": 99,
+              "astId": 168,
               "type": "t_bytes",
-              "src": "1012:9:1"
+              "src": "996:9:2"
             }
           ]
         },
@@ -108,15 +108,15 @@
           "members": [
             {
               "label": "types",
-              "astId": 86,
+              "astId": 155,
               "type": "t_array:dyn<t_bytes32>",
-              "src": "857:15:1"
+              "src": "841:15:2"
             },
             {
               "label": "is_in",
-              "astId": 90,
+              "astId": 159,
               "type": "t_mapping<t_bool>",
-              "src": "882:30:1"
+              "src": "866:30:2"
             }
           ]
         },
@@ -146,21 +146,21 @@
           "members": [
             {
               "label": "total_bytes",
-              "astId": 102,
+              "astId": 171,
               "type": "t_uint256",
-              "src": "1057:19:1"
+              "src": "1041:19:2"
             },
             {
               "label": "usage_type",
-              "astId": 104,
+              "astId": 173,
               "type": "t_bytes32",
-              "src": "1086:18:1"
+              "src": "1070:18:2"
             },
             {
               "label": "file",
-              "astId": 106,
+              "astId": 175,
               "type": "t_bytes32",
-              "src": "1144:12:1"
+              "src": "1128:12:2"
             }
           ]
         },
@@ -181,91 +181,91 @@
       "storage": [
         {
           "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
+          "path": "contracts/Initializable.sol",
           "label": "initialized",
-          "astId": 1757,
+          "astId": 3,
           "type": "t_bool",
-          "src": "757:24:4"
+          "src": "765:24:0"
         },
         {
           "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
+          "path": "contracts/Initializable.sol",
           "label": "initializing",
-          "astId": 1759,
+          "astId": 5,
           "type": "t_bool",
-          "src": "876:25:4"
+          "src": "892:25:0"
         },
         {
           "contract": "Initializable",
-          "path": "zos-lib/contracts/Initializable.sol",
+          "path": "contracts/Initializable.sol",
           "label": "______gap",
-          "astId": 1815,
+          "astId": 67,
           "type": "t_array:50<t_uint256>",
-          "src": "1951:29:4"
+          "src": "2100:29:0"
         },
         {
           "contract": "NewfangDIDRegistry",
           "path": "contracts/NewfangDIDRegistry.sol",
           "label": "log",
-          "astId": 47,
+          "astId": 116,
           "type": "t_bytes32",
-          "src": "176:18:1"
+          "src": "160:18:2"
         },
         {
           "contract": "NewfangDIDRegistry",
           "path": "contracts/NewfangDIDRegistry.sol",
           "label": "owners",
-          "astId": 51,
+          "astId": 120,
           "type": "t_mapping<t_address>",
-          "src": "269:41:1"
+          "src": "253:41:2"
         },
         {
           "contract": "NewfangDIDRegistry",
           "path": "contracts/NewfangDIDRegistry.sol",
           "label": "accessSpecifier",
-          "astId": 59,
+          "astId": 128,
           "type": "t_mapping<t_uint256>",
-          "src": "391:90:1"
+          "src": "375:90:2"
         },
         {
           "contract": "NewfangDIDRegistry",
           "path": "contracts/NewfangDIDRegistry.sol",
           "label": "userAccess",
-          "astId": 66,
+          "astId": 135,
           "type": "t_mapping<t_array:dyn<t_address>>",
-          "src": "566:67:1"
+          "src": "550:67:2"
         },
         {
           "contract": "NewfangDIDRegistry",
           "path": "contracts/NewfangDIDRegistry.sol",
           "label": "nonce",
-          "astId": 70,
+          "astId": 139,
           "type": "t_mapping<t_uint256>",
-          "src": "639:37:1"
+          "src": "623:37:2"
         },
         {
           "contract": "NewfangDIDRegistry",
           "path": "contracts/NewfangDIDRegistry.sol",
           "label": "files",
-          "astId": 74,
+          "astId": 143,
           "type": "t_mapping<t_struct<NewfangDIDRegistry.File>>",
-          "src": "682:37:1"
+          "src": "666:37:2"
         },
         {
           "contract": "NewfangDIDRegistry",
           "path": "contracts/NewfangDIDRegistry.sol",
           "label": "accessTypes",
-          "astId": 78,
+          "astId": 147,
           "type": "t_mapping<t_struct<NewfangDIDRegistry.Access>>",
-          "src": "725:38:1"
+          "src": "709:38:2"
         },
         {
           "contract": "NewfangDIDRegistry",
           "path": "contracts/NewfangDIDRegistry.sol",
           "label": "usages",
-          "astId": 83,
+          "astId": 152,
           "type": "t_mapping<t_array:dyn<t_struct<NewfangDIDRegistry.Usage>>>",
-          "src": "769:34:1"
+          "src": "753:34:2"
         }
       ],
       "warnings": {
@@ -273,34 +273,7 @@
         "hasSelfDestruct": false,
         "hasDelegateCall": false,
         "hasInitialValuesInDeclarations": false,
-        "uninitializedBaseContracts": [],
-        "storageUncheckedVars": [
-          {
-            "contract": "NewfangDIDRegistry",
-            "path": "contracts/NewfangDIDRegistry.sol",
-            "label": "files",
-            "astId": 74,
-            "type": "t_mapping<t_struct<NewfangDIDRegistry.File>>",
-            "src": "682:37:1"
-          },
-          {
-            "contract": "NewfangDIDRegistry",
-            "path": "contracts/NewfangDIDRegistry.sol",
-            "label": "accessTypes",
-            "astId": 78,
-            "type": "t_mapping<t_struct<NewfangDIDRegistry.Access>>",
-            "src": "725:38:1"
-          },
-          {
-            "contract": "NewfangDIDRegistry",
-            "path": "contracts/NewfangDIDRegistry.sol",
-            "label": "usages",
-            "astId": 83,
-            "type": "t_mapping<t_array:dyn<t_struct<NewfangDIDRegistry.Usage>>>",
-            "src": "769:34:1"
-          }
-        ],
-        "storageDiff": []
+        "uninitializedBaseContracts": []
       }
     }
   },
@@ -308,17 +281,17 @@
   "proxies": {
     "./NewfangDIDRegistry": [
       {
-        "address": "0xB2CB81e3fB29C8491283213195F6A53d31Be1198",
-        "version": "1.0.0",
-        "implementation": "0x0906E8Df096bf13fB1e0DEC1D090490465354dF8",
-        "admin": "0x0b767CFD8abcA586547B1558679B44952a6717f3",
+        "address": "0x3843E6781A5c37dfA3649563Dd3E9A53D41959C3",
+        "version": "skizzle_smart_contracts",
+        "implementation": "0xef2A3591f8FB2d8361D05F224bfc89658ADbB0F2",
+        "admin": "0xb06625D68FCCf2a8Ec7ab34F4899C32A6A15452b",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "1.0.0",
+  "version": "skizzle_smart_contracts",
   "proxyAdmin": {
-    "address": "0x0b767CFD8abcA586547B1558679B44952a6717f3"
+    "address": "0xb06625D68FCCf2a8Ec7ab34F4899C32A6A15452b"
   }
 }

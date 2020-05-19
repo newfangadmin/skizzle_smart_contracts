@@ -148,3 +148,6 @@ Coming Soon!
 - [did-core](https://w3c.github.io/did-core/)
 - [Newfang DID Resolver](https://github.com/newfangadmin/newfang_did_resolver)
 - [Privacy by Design](https://en.wikipedia.org/wiki/Privacy_by_design)
+
+## Steps to upgrade the contract
++ truffle compile
