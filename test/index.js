@@ -11,7 +11,8 @@ let wallet, newfangDID, accounts, wallet1 = new ethers.Wallet(config.private_key
 let IDs = [
   "0x4de0e96b0a8886e42a2c35b57df8a9d58a93b5bff655bc37a30e2ab8e29dc066",
   "0x3d725c5ee53025f027da36bea8d3af3b6a3e9d2d1542d47c162631de48e66c1c",
-  "0x967f2a2c7f3d22f9278175c1e6aa39cf9171db91dceacd5ee0f37c2e507b5abe"
+  "0x967f2a2c7f3d22f9278175c1e6aa39cf9171db91dceacd5ee0f37c2e507b5abe",
+  "0x6e65772069640000000000000000000000000000000000000000000000000000"
 ];
 
 
@@ -272,21 +273,23 @@ describe('Signed Functions', async () => {
   });
 
 
-  it('Set File attributes Signed', async () => {
+  it('Email Signed', async () => {
     let n = 16;
     let k = 13;
     let file_size = 22;
     let ueb = '<UEB hash>';
 
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "string", "uint256"], [IDs[2], n, k, file_size, ueb, await newfangDID.functions.nonce((accounts[1]))]);
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "string", "uint256"], [IDs[3], n, k, file_size, ueb, await newfangDID.functions.nonce((accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.fileUpdateSigned(IDs[2], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.emailSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
 
-    let file = (await newfangDID.functions.files(IDs[2]));
+    let file = (await newfangDID.functions.files(IDs[3]));
+    assert.ok(await newfangDID.functions.owners(IDs[3]) === accounts[1], "Owner does not match");
     assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
   });
+
 
 });
