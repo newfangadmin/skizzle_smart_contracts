@@ -151,6 +151,14 @@ contract NewfangDIDRegistry {
     }
 
 
+    event NewShare(
+        address indexed identity,
+        bytes32 indexed file,
+        address indexed user,
+        bytes32 access_type,
+        uint256 validity
+    );
+
     /**
     * @dev key is encrypted with users public key and stored on a server hash of encrypted key is stored here in smart
      contract along with its validity
@@ -161,11 +169,11 @@ contract NewfangDIDRegistry {
             for (uint i = 0; i < _user.length; i++) {
                 require(_identity == owners[_files[j]]);
                 require(_validity[i] != 0, "Validity must be non zero");
-                //                ACK memory ack = accessSpecifier[_files[j]][_access_type[i]][_user[i]];
-                //                require(ack == 0, "Already shared with user");
                 accessSpecifier[_files[j]][_access_type[i]][_user[i]] = now.add(_validity[i]);
                 userAccess[_files[j]][_access_type[i]].push(_user[i]);
+                emit NewShare(_identity, _files[j], _user[i], _access_type[i], _validity[i]);
 
+                // Keep track of access types defined for a particular file
                 if (!accessTypes[_files[j]].is_in[_access_type[i]]) {
                     accessTypes[_files[j]].types.push(_access_type[i]);
                     accessTypes[_files[j]].is_in[_access_type[i]] = true;
@@ -173,7 +181,6 @@ contract NewfangDIDRegistry {
 
             }
         }
-
         nonce[_identity]++;
         return true;
     }
@@ -189,12 +196,22 @@ contract NewfangDIDRegistry {
         return share(actualSigner, _file, _user, _access_type, _validity);
     }
 
+    event NewFileUpdate(
+        address identity,
+        bytes32 file,
+        uint256 n,
+        uint256 k,
+        uint256 file_size,
+        string ueb
+    );
+
     function fileUpdate(address _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
         require(owners[_file] != address(0), "File does not has an owner");
         require(n > k, "n>k");
         require(k > 1, "k should not be 0");
         require(file_size != 0, "Should not be 0");
         files[_file] = File(n, k, file_size, ueb);
+        emit NewFileUpdate(_identity, _file, n, k, file_size, ueb);
         nonce[_identity]++;
         return true;
     }
@@ -210,14 +227,16 @@ contract NewfangDIDRegistry {
     }
 
     event KeyHash(
-        address user,
-        uint256 validity
+        address indexed user,
+        uint256 validity,
+        bytes32 indexed file,
+        bytes32 access_type
     );
 
     function getKeyHash(address _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256){
         uint256 validity = accessSpecifier[_file][_access_type][_identity];
         nonce[_identity]++;
-        emit KeyHash(_identity, validity);
+        emit KeyHash(_identity, validity, _file, _access_type);
         return (validity);
     }
 
@@ -300,26 +319,6 @@ contract NewfangDIDRegistry {
     }
 
     /**
-    * @dev This function is used for billing purpose. Usage is stored in the contract and bills are calculated off chain
-    */
-    function addUsage(address _identity, uint256 _total_bytes, bytes32 _type, bytes32 _file) internal {
-        Usage memory usage = Usage(_total_bytes, _type, _file);
-        usages[_identity].push(usage);
-        nonce[_identity]++;
-    }
-
-    //    function addUsage(uint256 _total_bytes, bytes32 _type, bytes32 _file) public {
-    //        addUsage(msg.sender, _total_bytes, _type, _file);
-    //    }
-    //
-    //
-    //    function addUsageSigned(uint256 _total_bytes, bytes32 _type, bytes32 _file, address signer, uint8 v, bytes32 r, bytes32 s) public {
-    //        bytes32 payloadHash = keccak256(abi.encode(_total_bytes, _type, _file,nonce[signer]));
-    //        address actualSigner = getSigner(payloadHash, signer, v, r, s);
-    //        addUsage(actualSigner, _total_bytes, _type, _file);
-    //    }
-
-    /**
     * @dev this function is the combination of createDID, fileUpdate
     */
     function email(address _identity, bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal {
@@ -332,7 +331,7 @@ contract NewfangDIDRegistry {
         fileUpdate(msg.sender, _file_id, n, k, file_size, ueb);
     }
 
-    function emailSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public{
+    function emailSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, string memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public {
         bytes32 payloadHash = keccak256(abi.encode(_file, n, k, file_size, ueb, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
         email(actualSigner, _file, n, k, file_size, ueb);
