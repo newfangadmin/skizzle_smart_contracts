@@ -299,21 +299,31 @@ contract NewfangDIDRegistry {
         return changeFileOwner(actualSigner, _file, _new_owner);
     }
 
+    /**
+    * @dev This function is used for billing purpose. Usage is stored in the contract and bills are calculated off chain
+    */
     function addUsage(address _identity, uint256 _total_bytes, bytes32 _type, bytes32 _file) internal {
         Usage memory usage = Usage(_total_bytes, _type, _file);
         usages[_identity].push(usage);
         nonce[_identity]++;
     }
 
-    function addUsage(uint256 _total_bytes, bytes32 _type, bytes32 _file) public {
-        addUsage(msg.sender, _total_bytes, _type, _file);
+    //    function addUsage(uint256 _total_bytes, bytes32 _type, bytes32 _file) public {
+    //        addUsage(msg.sender, _total_bytes, _type, _file);
+    //    }
+    //
+    //
+    //    function addUsageSigned(uint256 _total_bytes, bytes32 _type, bytes32 _file, address signer, uint8 v, bytes32 r, bytes32 s) public {
+    //        bytes32 payloadHash = keccak256(abi.encode(_total_bytes, _type, _file,nonce[signer]));
+    //        address actualSigner = getSigner(payloadHash, signer, v, r, s);
+    //        addUsage(actualSigner, _total_bytes, _type, _file);
+    //    }
+
+    /**
+    * @dev this function is the combination of createDID, fileUpdate
+    */
+    function email(address _identity, bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, string memory ueb) internal {
+        createDID(_file_id, _identity);
+        fileUpdate(_identity, _file_id, n, k, file_size, ueb);
     }
-
-
-    function addUsageSigned(uint256 _total_bytes, bytes32 _type, bytes32 _file, address signer, uint8 v, bytes32 r, bytes32 s) public {
-        bytes32 payloadHash = keccak256(abi.encode(_total_bytes, _type, _file,nonce[signer]));
-        address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        addUsage(actualSigner, _total_bytes, _type, _file);
-    }
-
 }
