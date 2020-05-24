@@ -153,7 +153,8 @@ contract NewfangDIDRegistry is Initializable {
         bytes32 indexed file,
         address indexed user,
         bytes32 access_type,
-        uint256 validity
+        uint256 validity,
+        uint256 nonce
     );
 
     // TODO array limit
@@ -169,8 +170,7 @@ contract NewfangDIDRegistry is Initializable {
                 require(_validity[i] != 0, "Validity must be non zero");
                 accessSpecifier[_files[j]][_access_type[i]][_user[i]] = now.add(_validity[i]);
                 userAccess[_files[j]][_access_type[i]].push(_user[i]);
-                // TODO file_size
-                emit NewShare(_identity, _files[j], _user[i], _access_type[i], _validity[i]);
+                emit NewShare(_identity, _files[j], _user[i], _access_type[i], _validity[i], nonce[_identity]);
 
                 // Keep track of access types defined for a particular file
                 if (!accessTypes[_files[j]].is_in[_access_type[i]]) {
@@ -181,7 +181,6 @@ contract NewfangDIDRegistry is Initializable {
             }
         }
 
-        // TODO event for total share
         nonce[_identity]++;
         return true;
     }
