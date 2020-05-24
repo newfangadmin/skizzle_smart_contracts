@@ -171,9 +171,9 @@ describe('Contract functions', async () => {
 
     assert.ok(parseInt(await newfangDID.getTotalUsers(IDs[1], AccessTypes.read)) === 1, 'Invalid total read users');
 
-    // let gas = await newfangDID.estimate.removeDID(IDs[1]);
+    // let gas = await newfangDID.estimate.deleteFile(IDs[1]);
     // console.log(parseInt(gas));
-    let tx = await newfangDID.removeDID(IDs[1]);
+    let tx = await newfangDID.deleteFile(IDs[1]);
     await tx.wait();
 
     assert.ok(parseInt(await newfangDID.getTotalUsers(IDs[1], AccessTypes.read)) === 0, 'Total users must be 0');

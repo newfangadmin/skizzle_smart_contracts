@@ -79,9 +79,12 @@ contract NewfangDIDRegistry is Initializable {
         return createDID(_id, actualSigner);
     }
 
+    event deleteFileEvent(
+        bytes32 indexed _id,
+        address indexed _identity
+    );
 
-    // TODO rename to delete
-    function removeDID(bytes32 _id, address _identity) internal returns (bool) {
+    function deleteFile(bytes32 _id, address _identity) internal returns (bool) {
         require(owners[_id] == _identity, "Owner does not match");
 
         // Remove access of all the users
@@ -103,19 +106,19 @@ contract NewfangDIDRegistry is Initializable {
         // Remove file owner
         delete owners[_id];
 
-        // TODO add event inlucde n, k, file size
         nonce[_identity]++;
+        emit deleteFileEvent(_id, _identity);
         return true;
     }
 
-    function removeDID(bytes32 _id) public returns (bool){
-        return removeDID(_id, msg.sender);
+    function deleteFile(bytes32 _id) public returns (bool){
+        return deleteFile(_id, msg.sender);
     }
 
-    function removeDIDSigned(bytes32 _id, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+    function deleteFileSigned(bytes32 _id, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
         bytes32 payloadHash = keccak256(abi.encode(_id, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return removeDID(_id, actualSigner);
+        return deleteFile(_id, actualSigner);
     }
 
 
