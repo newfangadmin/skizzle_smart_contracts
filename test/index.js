@@ -153,7 +153,7 @@ describe('Contract functions', async () => {
     let n = 6;
     let k = 3;
     let file_size = 12;
-    let ueb_string = '<UEB hash>';
+    let ueb_string = 'b5bu7qiqqkkokvy3lh66ds7tnnl4kjnqngqtdz5y3ybks25vjama';
     let ueb = ethers.utils.toUtf8Bytes(ueb_string);
     let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.fileUpdate(IDs[0], n, k, file_size, ueb);
     await tx.wait();
@@ -171,6 +171,8 @@ describe('Contract functions', async () => {
 
     assert.ok(parseInt(await newfangDID.getTotalUsers(IDs[1], AccessTypes.read)) === 1, 'Invalid total read users');
 
+    // let gas = await newfangDID.estimate.removeDID(IDs[1]);
+    // console.log(parseInt(gas));
     let tx = await newfangDID.removeDID(IDs[1]);
     await tx.wait();
 
@@ -184,9 +186,8 @@ describe('Contract functions', async () => {
     let n = 6;
     let k = 3;
     let file_size = 12;
-    let ueb_string = '<UEB hash>';
+    let ueb_string = 'b5bu7qiqqkkokvy3lh66ds7tnnl4kjnqngqtdz5y3ybks25vjama';
     let ueb = ethers.utils.toUtf8Bytes(ueb_string);
-
     let did_tx = await newfangDID.email(IDs[1], n, k, file_size, ueb);
     await did_tx.wait();
     let file = (await newfangDID.functions.files(IDs[1]));
@@ -198,13 +199,15 @@ describe('Contract functions', async () => {
 
 describe('Signed Functions', async () => {
   it('Get Key hash Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[0], AccessTypes.read, await newfangDID.functions.nonce((accounts[1]))]);
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[0], AccessTypes.read, await newfangDID.functions.nonce((accounts[2]))]);
     let payloadHash = ethers.utils.keccak256(payload);
-    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+    let signature = await provider.getSigner(accounts[2]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.getKeyHashSigned(IDs[0], AccessTypes.read, (accounts[1]), sig.v, sig.r, sig.s);
+    // let gas = await newfangDID.estimate.getKeyHashSigned(IDs[0], AccessTypes.read, (accounts[1]), sig.v, sig.r, sig.s);
+    // console.log(parseInt(gas));
+    let tx = await newfangDID.functions.getKeyHashSigned(IDs[0], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s);
     let data = await tx.wait();
-    let validity = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[1])));
+    let validity = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[2])));
     assert.ok(parseInt(data.events[0].args[1]) === parseInt(validity), "Wrong data");
   });
 
@@ -241,6 +244,13 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
+    // let gas = await newfangDID.estimate.shareSigned(
+    //   [IDs[2]],
+    //   [(accounts[1])],
+    //   [AccessTypes.read],
+    //   [120],
+    //   (accounts[1]), sig.v, sig.r, sig.s);
+    // console.log(parseInt(gas));
     let tx = await newfangDID.functions.shareSigned(
       [IDs[2]],
       [(accounts[1])],
@@ -268,6 +278,8 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
+    // let gas = await newfangDID.estimate.updateACKSigned(IDs[2], (accounts[1]), AccessTypes["read"], 0, (accounts[1]), sig.v, sig.r, sig.s);
+    // console.log(parseInt(gas));
     let tx = await newfangDID.functions.updateACKSigned(IDs[2], (accounts[1]), AccessTypes["read"], 0, (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[1])));
@@ -278,13 +290,15 @@ describe('Signed Functions', async () => {
     let n = 16;
     let k = 13;
     let file_size = 22;
-    let ueb_string = '<UEB hash>';
+    let ueb_string = 'b5bu7qiqqkkokvy3lh66ds7tnnl4kjnqngqtdz5y3ybks25vjama';
     let ueb = ethers.utils.toUtf8Bytes(ueb_string);
 
     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "bytes", "uint256"], [IDs[2], n, k, file_size, ueb, await newfangDID.functions.nonce(accounts[1])]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
+    // let gas = await newfangDID.estimate.fileUpdateSigned(IDs[2], n, k, file_size, ueb, accounts[1], sig.v, sig.r, sig.s);
+    // console.log(parseInt(gas));
     let tx = await newfangDID.functions.fileUpdateSigned(IDs[2], n, k, file_size, ueb, accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
 
@@ -297,16 +311,17 @@ describe('Signed Functions', async () => {
     let n = 16;
     let k = 13;
     let file_size = 22;
-    let ueb_string = '<UEB hash>';
+    let ueb_string = 'b5bu7qiqqkkokvy3lh66ds7tnnl4kjnqngqtdz5y3ybks25vjama';
     let ueb = ethers.utils.toUtf8Bytes(ueb_string);
 
     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "bytes", "uint256"], [IDs[3], n, k, file_size, ueb, await newfangDID.functions.nonce((accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
+    // let gas = await newfangDID.estimate.emailSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
+    // console.log(parseInt(gas));
     let tx = await newfangDID.functions.emailSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
-
     let file = (await newfangDID.functions.files(IDs[3]));
     assert.ok(await newfangDID.functions.owners(IDs[3]) === accounts[1], "Owner does not match");
     assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && ethers.utils.toUtf8String(file.ueb) === ueb_string, "File attributes don't match");

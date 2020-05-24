@@ -1,8 +1,10 @@
-pragma solidity ^0.5;
+pragma solidity 0.5.14;
 
 import './SafeMath.sol';
 
 import "./Initializable.sol";
+
+// TODO block timestamp
 
 contract NewfangDIDRegistry is Initializable {
     using SafeMath for uint;
@@ -10,7 +12,7 @@ contract NewfangDIDRegistry is Initializable {
 
     // keccak256(storage index) => bytes32 newfang-specific-idbytes
     mapping(bytes32 => address) public owners; // file owners
-    // file id => access type => user => access control key
+    // file id => access type => user => validity
     mapping(bytes32 => mapping(bytes32 => mapping(address => uint256))) public accessSpecifier;
     // It is used to get all users of a particular type with particular access
     mapping(bytes32 => mapping(bytes32 => address[])) public userAccess;
@@ -78,6 +80,7 @@ contract NewfangDIDRegistry is Initializable {
     }
 
 
+    // TODO rename to delete
     function removeDID(bytes32 _id, address _identity) internal returns (bool) {
         require(owners[_id] == _identity, "Owner does not match");
 
@@ -100,6 +103,7 @@ contract NewfangDIDRegistry is Initializable {
         // Remove file owner
         delete owners[_id];
 
+        // TODO add event inlucde n, k, file size
         nonce[_identity]++;
         return true;
     }
@@ -149,6 +153,7 @@ contract NewfangDIDRegistry is Initializable {
         uint256 validity
     );
 
+    // TODO array limit
     /**
     * @dev key is encrypted with users public key and stored on a server hash of encrypted key is stored here in smart
      contract along with its validity
@@ -161,6 +166,7 @@ contract NewfangDIDRegistry is Initializable {
                 require(_validity[i] != 0, "Validity must be non zero");
                 accessSpecifier[_files[j]][_access_type[i]][_user[i]] = now.add(_validity[i]);
                 userAccess[_files[j]][_access_type[i]].push(_user[i]);
+                // TODO file_size
                 emit NewShare(_identity, _files[j], _user[i], _access_type[i], _validity[i]);
 
                 // Keep track of access types defined for a particular file
@@ -171,6 +177,8 @@ contract NewfangDIDRegistry is Initializable {
 
             }
         }
+
+        // TODO event for total share
         nonce[_identity]++;
         return true;
     }
@@ -187,12 +195,12 @@ contract NewfangDIDRegistry is Initializable {
     }
 
     event NewFileUpdate(
-        address identity,
-        bytes32 file,
+        address indexed identity,
+        bytes32 indexed file,
         uint256 n,
         uint256 k,
         uint256 file_size,
-        bytes ueb
+        bytes indexed ueb
     );
 
     function fileUpdate(address _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
@@ -223,9 +231,12 @@ contract NewfangDIDRegistry is Initializable {
         bytes32 access_type
     );
 
+    // TODO rename to download
     function getKeyHash(address _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256){
         uint256 validity = accessSpecifier[_file][_access_type][_identity];
+        require(validity != uint256(0), "Validity is 0");
         nonce[_identity]++;
+        // TODO add n, k, file size, owner in event
         emit KeyHash(_identity, validity, _file, _access_type);
         return (validity);
     }
@@ -308,6 +319,8 @@ contract NewfangDIDRegistry is Initializable {
         return changeFileOwner(actualSigner, _file, _new_owner);
     }
 
+
+    // TODO rename to upload
     /**
     * @dev this function is the combination of createDID, fileUpdate
     */
