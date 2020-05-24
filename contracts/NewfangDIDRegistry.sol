@@ -233,12 +233,11 @@ contract NewfangDIDRegistry is Initializable {
         bytes32 access_type
     );
 
-    // TODO rename to download
-    function getKeyHash(address _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256){
+
+    function download(address _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256){
         uint256 validity = accessSpecifier[_file][_access_type][_identity];
         require(validity != uint256(0), "Validity is 0");
         nonce[_identity]++;
-        // TODO add n, k, file size, owner in event
         emit KeyHash(_identity, validity, _file, _access_type);
         return (validity);
     }
@@ -248,14 +247,14 @@ contract NewfangDIDRegistry is Initializable {
     * @dev Fetch ACK hash of user
     * @return encrypted hash and validity
     */
-    function getKeyHash(bytes32 _file, bytes32 _access_type) public returns (uint256){
-        return getKeyHash(msg.sender, _file, _access_type);
+    function download(bytes32 _file, bytes32 _access_type) public returns (uint256){
+        return download(msg.sender, _file, _access_type);
     }
 
-    function getKeyHashSigned(bytes32 _file, bytes32 _access_type, address signer, uint8 v, bytes32 r, bytes32 s) public returns (uint256) {
+    function downloadSigned(bytes32 _file, bytes32 _access_type, address signer, uint8 v, bytes32 r, bytes32 s) public returns (uint256) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _access_type, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return getKeyHash(actualSigner, _file, _access_type);
+        return download(actualSigner, _file, _access_type);
     }
 
 

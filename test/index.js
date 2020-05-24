@@ -120,7 +120,7 @@ describe('Contract functions', async () => {
   });
 
   it('Get Key hash', async () => {
-    let tx = await newfangDID.connect(provider.getSigner(accounts[2])).functions.getKeyHash(IDs[0], AccessTypes["read"]);
+    let tx = await newfangDID.connect(provider.getSigner(accounts[2])).functions.download(IDs[0], AccessTypes["read"]);
     let data = await tx.wait();
     let validity = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[2]));
     assert.ok(parseInt(data.events[0].args[1]) === parseInt(validity), "Wrong data");
@@ -203,9 +203,9 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[2]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    // let gas = await newfangDID.estimate.getKeyHashSigned(IDs[0], AccessTypes.read, (accounts[1]), sig.v, sig.r, sig.s);
+    // let gas = await newfangDID.estimate.downloadSigned(IDs[0], AccessTypes.read, (accounts[1]), sig.v, sig.r, sig.s);
     // console.log(parseInt(gas));
-    let tx = await newfangDID.functions.getKeyHashSigned(IDs[0], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.downloadSigned(IDs[0], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s);
     let data = await tx.wait();
     let validity = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[2])));
     assert.ok(parseInt(data.events[0].args[1]) === parseInt(validity), "Wrong data");
