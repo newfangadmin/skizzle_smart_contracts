@@ -5,7 +5,7 @@ const config = require('../config.json');
 const ganache = require('ganache-cli');
 const provider = new ethers.providers.Web3Provider(ganache.provider({gasLimit: 7000000}));
 
-const newfangJson = require('../build/NewfangDIDRegistry.json');
+const newfangJson = require('../build/Skizzle.json');
 
 let wallet, newfangDID, accounts, wallet1 = new ethers.Wallet(config.private_key);
 let IDs = [
@@ -182,13 +182,13 @@ describe('Contract functions', async () => {
 
   });
 
-  it('Email(createDID + fileUpdate)', async () => {
+  it('upload(createDID + fileUpdate)', async () => {
     let n = 6;
     let k = 3;
     let file_size = 12;
     let ueb_string = 'b5bu7qiqqkkokvy3lh66ds7tnnl4kjnqngqtdz5y3ybks25vjama';
     let ueb = ethers.utils.toUtf8Bytes(ueb_string);
-    let did_tx = await newfangDID.email(IDs[1], n, k, file_size, ueb);
+    let did_tx = await newfangDID.upload(IDs[1], n, k, file_size, ueb);
     await did_tx.wait();
     let file = (await newfangDID.functions.files(IDs[1]));
     assert.ok(await newfangDID.functions.owners(IDs[1]) === (await wallet.getAddress()), "Owner does not match");
@@ -307,7 +307,7 @@ describe('Signed Functions', async () => {
   });
 
 
-  it('Email Signed', async () => {
+  it('upload Signed', async () => {
     let n = 16;
     let k = 13;
     let file_size = 22;
@@ -318,9 +318,9 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    // let gas = await newfangDID.estimate.emailSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
+    // let gas = await newfangDID.estimate.uploadSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
     // console.log(parseInt(gas));
-    let tx = await newfangDID.functions.emailSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.uploadSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     let file = (await newfangDID.functions.files(IDs[3]));
     assert.ok(await newfangDID.functions.owners(IDs[3]) === accounts[1], "Owner does not match");

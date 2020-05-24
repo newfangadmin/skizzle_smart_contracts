@@ -6,7 +6,7 @@ import "./Initializable.sol";
 
 // TODO block timestamp
 
-contract NewfangDIDRegistry is Initializable {
+contract Skizzle is Initializable {
     using SafeMath for uint;
     bytes32 public log;
 
@@ -321,23 +321,22 @@ contract NewfangDIDRegistry is Initializable {
     }
 
 
-    // TODO rename to upload
     /**
     * @dev this function is the combination of createDID, fileUpdate
     */
-    function email(address _identity, bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) internal {
+    function upload(address _identity, bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) internal {
         createDID(_file_id, _identity);
         fileUpdate(_identity, _file_id, n, k, file_size, ueb);
     }
 
-    function email(bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) public {
+    function upload(bytes32 _file_id, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) public {
         createDID(_file_id, msg.sender);
         fileUpdate(msg.sender, _file_id, n, k, file_size, ueb);
     }
 
-    function emailSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, bytes memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public {
+    function uploadSigned(bytes32 _file, uint256 n, uint256 k, uint256 file_size, bytes memory ueb, address signer, uint8 v, bytes32 r, bytes32 s) public {
         bytes32 payloadHash = keccak256(abi.encode(_file, n, k, file_size, ueb, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        email(actualSigner, _file, n, k, file_size, ueb);
+        upload(actualSigner, _file, n, k, file_size, ueb);
     }
 }
