@@ -101,7 +101,7 @@ describe('Contract functions', async () => {
 
   it('No of file limit', async () => {
     let tx, ids = [];
-    let total_files = 62;
+    let total_files = 50;
     for (let i = 0; i < total_files; i++) {
         let id = ethers.utils.formatBytes32String(i+"asdfasfdasdf");
         ids.push(id);
