@@ -3,7 +3,7 @@ const ethers = require('ethers');
 const config = require('../config.json');
 
 const ganache = require('ganache-cli');
-const provider = new ethers.providers.Web3Provider(ganache.provider({gasLimit: 7000000}));
+const provider = new ethers.providers.Web3Provider(ganache.provider({gasLimit: 8000000}));
 
 const newfangJson = require('../build/Skizzle.json');
 
@@ -65,9 +65,14 @@ describe('Contract initialization, DID creation', async () => {
 describe('Contract functions', async () => {
   it('Share a file', async () => {
     let tx, ACK, ids = [], users = [], accessTypes = [], validity = [];
-
-    for (let i = 2; i < 8; i++) {
-      users.push((accounts[i]));
+    // let total_user = 151;
+    let total_user = 8;
+    for (let i = 2; i < total_user; i++) {
+      if (i < 8) {
+        users.push((accounts[i]));
+      } else {
+        users.push((await ethers.Wallet.createRandom()).address);
+      }
       accessTypes.push(AccessTypes["read"]);
       validity.push(120);
     }
@@ -76,26 +81,36 @@ describe('Contract functions', async () => {
     await tx.wait();
 
     // Verify the changes
-    for (let i = 2; i < 8; i++) {
-
-      ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[i])));
-      assert.ok(parseInt(ACK._type) !== 0,
-        "Type hash not set");
-      assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
+    for (let i = 2; i < total_user; i++) {
+      if(users[i]){
+        ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], users[i]));
+        assert.ok(parseInt(ACK._type) !== 0,
+          "Type hash not set");
+        assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
+      }
     }
 
 
-    // tx = await newfangDID.updateACK(IDs[0], accounts[6], AccessTypes.read,
-    //   ethers.utils.hashMessage("asdf"), 0);
-    // await tx.wait();
-    // tx = await newfangDID.functions.share(IDs[0], accounts[6], AccessTypes["read"],
-    //   ethers.utils.hashMessage("asdf"), 120);
-    // await tx.wait();
     let tx2 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
     let array = tx2.filter(function (e) {
       return e === (accounts[6]);
     });
+    // console.log(users.length, "share completed");
     assert.ok(array.length === 1, `Expected 1 but got ${array.length}`);
+  });
+
+  it('No of file limit', async () => {
+    let tx, ids = [];
+    let total_files = 62;
+    for (let i = 0; i < total_files; i++) {
+        let id = ethers.utils.formatBytes32String(i+"asdfasfdasdf");
+        ids.push(id);
+        let tx_temp = await newfangDID.createDID(id);
+        await tx_temp.wait();
+    }
+    tx = await newfangDID.functions.share(ids, [(await ethers.Wallet.createRandom()).address], [AccessTypes.read], [120]);
+    await tx.wait();
+    console.log(ids.length, "share completed")
   });
 
   it('share file with zero validity period', async () => {
