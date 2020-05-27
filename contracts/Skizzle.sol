@@ -2,11 +2,7 @@ pragma solidity ^0.5;
 
 import './SafeMath.sol';
 
-import "./Initializable.sol";
-
-// TODO block timestamp
-
-contract Skizzle is Initializable {
+contract Skizzle {
     using SafeMath for uint;
     bytes32 public log;
 
@@ -157,7 +153,6 @@ contract Skizzle is Initializable {
         uint256 nonce
     );
 
-    // TODO array limit
     /**
     * @dev key is encrypted with users public key and stored on a server hash of encrypted key is stored here in smart
      contract along with its validity
