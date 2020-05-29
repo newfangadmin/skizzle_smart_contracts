@@ -3,11 +3,15 @@ const ethers = require('ethers');
 const config = require('../config.json');
 
 const ganache = require('ganache-cli');
+const fs = require('fs');
+
 const provider = new ethers.providers.Web3Provider(ganache.provider({gasLimit: 8000000}));
 
 const newfangJson = require('../build/Skizzle.json');
 
 let wallet, newfangDID, accounts, wallet1 = new ethers.Wallet(config.private_key);
+
+let gasFees = {};
 let IDs = [
   "0x4de0e96b0a8886e42a2c35b57df8a9d58a93b5bff655bc37a30e2ab8e29dc066",
   "0x3d725c5ee53025f027da36bea8d3af3b6a3e9d2d1542d47c162631de48e66c1c",
@@ -21,6 +25,11 @@ let AccessTypes = {
   reshare: ethers.utils.formatBytes32String("reshare"),
   delete: ethers.utils.formatBytes32String("delete")
 };
+
+function updateGas(key, value) {
+  gasFees[key] = value;
+  fs.writeFileSync('gas.json', JSON.stringify(gasFees));
+}
 
 describe('Ganache Setup', async () => {
   it('initiates ganache and generates a bunch of demo accounts', async () => {
@@ -82,7 +91,7 @@ describe('Contract functions', async () => {
 
     // Verify the changes
     for (let i = 2; i < total_user; i++) {
-      if(users[i]){
+      if (users[i]) {
         ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], users[i]));
         assert.ok(parseInt(ACK._type) !== 0,
           "Type hash not set");
@@ -103,10 +112,10 @@ describe('Contract functions', async () => {
     let tx, ids = [];
     let total_files = 50;
     for (let i = 0; i < total_files; i++) {
-        let id = ethers.utils.formatBytes32String(i+"asdfasfdasdf");
-        ids.push(id);
-        let tx_temp = await newfangDID.createDID(id);
-        await tx_temp.wait();
+      let id = ethers.utils.formatBytes32String(i + "asdfasfdasdf");
+      ids.push(id);
+      let tx_temp = await newfangDID.createDID(id);
+      await tx_temp.wait();
     }
     tx = await newfangDID.functions.share(ids, [(await ethers.Wallet.createRandom()).address], [AccessTypes.read], [120]);
     await tx.wait();
@@ -186,8 +195,7 @@ describe('Contract functions', async () => {
 
     assert.ok(parseInt(await newfangDID.getTotalUsers(IDs[1], AccessTypes.read)) === 1, 'Invalid total read users');
 
-    // let gas = await newfangDID.estimate.deleteFile(IDs[1]);
-    // console.log(parseInt(gas));
+    updateGas("deleteFile", parseInt(await newfangDID.estimate.deleteFile(IDs[1])));
     let tx = await newfangDID.deleteFile(IDs[1]);
     await tx.wait();
 
@@ -218,8 +226,7 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[2]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    // let gas = await newfangDID.estimate.downloadSigned(IDs[0], AccessTypes.read, (accounts[1]), sig.v, sig.r, sig.s);
-    // console.log(parseInt(gas));
+    updateGas("download", parseInt(await newfangDID.estimate.downloadSigned(IDs[0], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s)));
     let tx = await newfangDID.functions.downloadSigned(IDs[0], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s);
     let data = await tx.wait();
     let validity = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[2])));
@@ -259,13 +266,13 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    // let gas = await newfangDID.estimate.shareSigned(
-    //   [IDs[2]],
-    //   [(accounts[1])],
-    //   [AccessTypes.read],
-    //   [120],
-    //   (accounts[1]), sig.v, sig.r, sig.s);
-    // console.log(parseInt(gas));
+    let gas = await newfangDID.estimate.shareSigned(
+      [IDs[2]],
+      [(accounts[1])],
+      [AccessTypes.read],
+      [120],
+      (accounts[1]), sig.v, sig.r, sig.s);
+    updateGas("share",parseInt(gas));
     let tx = await newfangDID.functions.shareSigned(
       [IDs[2]],
       [(accounts[1])],
@@ -293,8 +300,8 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    // let gas = await newfangDID.estimate.updateACKSigned(IDs[2], (accounts[1]), AccessTypes["read"], 0, (accounts[1]), sig.v, sig.r, sig.s);
-    // console.log(parseInt(gas));
+    let gas = await newfangDID.estimate.updateACKSigned(IDs[2], (accounts[1]), AccessTypes["read"], 0, (accounts[1]), sig.v, sig.r, sig.s);
+    updateGas("revoke",parseInt(gas));
     let tx = await newfangDID.functions.updateACKSigned(IDs[2], (accounts[1]), AccessTypes["read"], 0, (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[1])));
@@ -333,8 +340,8 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    // let gas = await newfangDID.estimate.uploadSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
-    // console.log(parseInt(gas));
+    let gas = await newfangDID.estimate.uploadSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
+    updateGas("upload",parseInt(gas));
     let tx = await newfangDID.functions.uploadSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     let file = (await newfangDID.functions.files(IDs[3]));
