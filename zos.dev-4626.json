@@ -1,7 +1,7 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0xee42b2Dcc3d32AD5E736df6245AD8A88a70ba6bF",
+      "address": "0x8b2C9732137bAD7e629139B1fDa9E6094368f6B4",
       "constructorCode": "608060405234801561001057600080fd5b50613b5f806100206000396000f3fe",
       "bodyBytecodeHash": "713ccadface9a99154ce8d70d57cda86899831c525f8067c964565a74fc29527",
       "localBytecodeHash": "8e6017d2956e457315f9450a61e48cd88b4662774a2c70023f57a199eadce478",
@@ -248,12 +248,12 @@
   },
   "solidityLibs": {},
   "proxies": {
-    "skizzle/Skizzle": [
+    "skizzle_smart_contracts/Skizzle": [
       {
-        "address": "0x56d38C60793b64aeab5E62630a2b690C695779da",
+        "address": "0x25c315E657385467433005D051FB90BdA789ac56",
         "version": "1.0.0",
-        "implementation": "0xee42b2Dcc3d32AD5E736df6245AD8A88a70ba6bF",
-        "admin": "0x7b0E5aCA6F088691561022A0dB37830b56cb581a",
+        "implementation": "0x8b2C9732137bAD7e629139B1fDa9E6094368f6B4",
+        "admin": "0xe021bf70cE7C47d9744b2BdbFC7bdA1b4C7cAbD9",
         "kind": "Upgradeable"
       }
     ]
@@ -261,6 +261,6 @@
   "zosversion": "2.2",
   "version": "1.0.0",
   "proxyAdmin": {
-    "address": "0x7b0E5aCA6F088691561022A0dB37830b56cb581a"
+    "address": "0xe021bf70cE7C47d9744b2BdbFC7bdA1b4C7cAbD9"
   }
 }

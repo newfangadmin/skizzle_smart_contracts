@@ -151,3 +151,11 @@ Coming Soon!
 
 ## Steps to upgrade the contract
 + truffle compile
+
+## Deploying proxy smart contract
+```shell script
+zos init # crates zos.json
+zos add Skizzle
+zos push --network private
+zos create
+```

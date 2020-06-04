@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 const solc = require('solc');
 
 const sourceFolderPath = path.resolve(__dirname, 'contracts');
-const buildFolderPath = path.resolve(__dirname, 'build');
+const buildFolderPath = path.resolve(__dirname, 'build/contracts');
 
 
 const getContractSource = contractFileName => {

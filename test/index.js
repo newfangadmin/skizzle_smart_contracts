@@ -7,7 +7,7 @@ const fs = require('fs');
 
 const provider = new ethers.providers.Web3Provider(ganache.provider({gasLimit: 8000000}));
 
-const newfangJson = require('../build/Skizzle.json');
+const newfangJson = require('../build/contracts/Skizzle.json');
 
 let wallet, newfangDID, accounts, wallet1 = new ethers.Wallet(config.private_key);
 
