@@ -1,11 +1,11 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0x8b2C9732137bAD7e629139B1fDa9E6094368f6B4",
-      "constructorCode": "608060405234801561001057600080fd5b50613b5f806100206000396000f3fe",
-      "bodyBytecodeHash": "713ccadface9a99154ce8d70d57cda86899831c525f8067c964565a74fc29527",
-      "localBytecodeHash": "8e6017d2956e457315f9450a61e48cd88b4662774a2c70023f57a199eadce478",
-      "deployedBytecodeHash": "8e6017d2956e457315f9450a61e48cd88b4662774a2c70023f57a199eadce478",
+      "address": "0x9e805A912edf6Ce7A57790f2797835Ff6220E5b0",
+      "constructorCode": "608060405234801561001057600080fd5b50613bcd806100206000396000f3fe",
+      "bodyBytecodeHash": "edecd0a08c5773adcb400c54bef3f5f38320377447b695dce7827e5fdcbb9bcd",
+      "localBytecodeHash": "6bd1e8917c4e2c24f877e3c40459b5a8be25c12b52f3107bebafe9539afa0654",
+      "deployedBytecodeHash": "6bd1e8917c4e2c24f877e3c40459b5a8be25c12b52f3107bebafe9539afa0654",
       "types": {
         "t_bytes32": {
           "id": "t_bytes32",
@@ -248,19 +248,19 @@
   },
   "solidityLibs": {},
   "proxies": {
-    "skizzle_smart_contracts/Skizzle": [
+    "#/Skizzle": [
       {
-        "address": "0x25c315E657385467433005D051FB90BdA789ac56",
-        "version": "1.0.0",
-        "implementation": "0x8b2C9732137bAD7e629139B1fDa9E6094368f6B4",
-        "admin": "0xe021bf70cE7C47d9744b2BdbFC7bdA1b4C7cAbD9",
+        "address": "0xb9b7BEAA9276F8C79996a4B70C3BB4E01C886e6f",
+        "version": "crates",
+        "implementation": "0x9e805A912edf6Ce7A57790f2797835Ff6220E5b0",
+        "admin": "0xCEAFbf96deCB0435CF7AD7AaA87ABdAFFE7D5356",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "1.0.0",
+  "version": "crates",
   "proxyAdmin": {
-    "address": "0xe021bf70cE7C47d9744b2BdbFC7bdA1b4C7cAbD9"
+    "address": "0xCEAFbf96deCB0435CF7AD7AaA87ABdAFFE7D5356"
   }
 }

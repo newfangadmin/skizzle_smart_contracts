@@ -157,5 +157,5 @@ Coming Soon!
 zos init # crates zos.json
 zos add Skizzle
 zos push --network private
-zos create
+zos create Skizzle --network private
 ```

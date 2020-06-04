@@ -76,7 +76,7 @@ contract Skizzle {
     }
 
     event deleteFileEvent(
-        bytes32 indexed _id,
+        bytes32 indexed file,
         address indexed _identity
     );
 
@@ -221,8 +221,8 @@ contract Skizzle {
         return fileUpdate(actualSigner, _file, n, k, file_size, ueb);
     }
 
-    event KeyHash(
-        address indexed user,
+    event NewDownload(
+        address indexed identity,
         uint256 validity,
         bytes32 indexed file,
         bytes32 access_type
@@ -233,7 +233,7 @@ contract Skizzle {
         uint256 validity = accessSpecifier[_file][_access_type][_identity];
         require(validity != uint256(0), "Validity is 0");
         nonce[_identity]++;
-        emit KeyHash(_identity, validity, _file, _access_type);
+        emit NewDownload(_identity, validity, _file, _access_type);
         return (validity);
     }
 
@@ -261,6 +261,15 @@ contract Skizzle {
         return i;
     }
 
+    event NewUpdateACK(
+        address indexed identity,
+        bytes32 indexed file,
+        address indexed user,
+        bytes32 access_type,
+        uint256 validity
+    );
+
+
     /**
     * @dev Update ACK(Access Control Key) validity, it can not be used to change access_type, to change you have to share the
     file again with desired access type and you may remove the previous access type
@@ -279,6 +288,7 @@ contract Skizzle {
             accessTypes[_file].is_in[_access_type] = true;
         }
         nonce[_identity]++;
+        emit NewUpdateACK(_identity, _file, _user, _access_type, _validity);
         return true;
     }
 
