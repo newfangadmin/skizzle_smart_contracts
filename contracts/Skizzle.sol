@@ -77,7 +77,8 @@ contract Skizzle {
 
     event deleteFileEvent(
         bytes32 indexed file,
-        address indexed _identity
+        address indexed identity,
+        uint256 timestamp
     );
 
     function deleteFile(bytes32 _id, address _identity) internal returns (bool) {
@@ -103,7 +104,7 @@ contract Skizzle {
         delete owners[_id];
 
         nonce[_identity]++;
-        emit deleteFileEvent(_id, _identity);
+        emit deleteFileEvent(_id, _identity, now);
         return true;
     }
 
@@ -150,7 +151,8 @@ contract Skizzle {
         address indexed user,
         bytes32 access_type,
         uint256 validity,
-        uint256 nonce
+        uint256 nonce,
+        uint256 timestamp
     );
 
     /**
@@ -165,7 +167,7 @@ contract Skizzle {
                 require(_validity[i] != 0, "Validity must be non zero");
                 accessSpecifier[_files[j]][_access_type[i]][_user[i]] = now.add(_validity[i]);
                 userAccess[_files[j]][_access_type[i]].push(_user[i]);
-                emit NewShare(_identity, _files[j], _user[i], _access_type[i], _validity[i], nonce[_identity]);
+                emit NewShare(_identity, _files[j], _user[i], _access_type[i], _validity[i], nonce[_identity], now);
 
                 // Keep track of access types defined for a particular file
                 if (!accessTypes[_files[j]].is_in[_access_type[i]]) {
@@ -197,7 +199,8 @@ contract Skizzle {
         uint256 n,
         uint256 k,
         uint256 file_size,
-        bytes indexed ueb
+        bytes indexed ueb,
+        uint256 timestamp
     );
 
     function fileUpdate(address _identity, bytes32 _file, uint256 n, uint256 k, uint256 file_size, bytes memory ueb) internal onlyFileOwner(_file, _identity) returns (bool){
@@ -206,7 +209,7 @@ contract Skizzle {
         require(k > 1, "k should not be 0");
         require(file_size != 0, "Should not be 0");
         files[_file] = File(n, k, file_size, ueb);
-        emit NewFileUpdate(_identity, _file, n, k, file_size, ueb);
+        emit NewFileUpdate(_identity, _file, n, k, file_size, ueb, now);
         nonce[_identity]++;
         return true;
     }
@@ -225,7 +228,8 @@ contract Skizzle {
         address indexed identity,
         uint256 validity,
         bytes32 indexed file,
-        bytes32 access_type
+        bytes32 access_type,
+        uint256 timestamp
     );
 
 
@@ -233,7 +237,7 @@ contract Skizzle {
         uint256 validity = accessSpecifier[_file][_access_type][_identity];
         require(validity != uint256(0), "Validity is 0");
         nonce[_identity]++;
-        emit NewDownload(_identity, validity, _file, _access_type);
+        emit NewDownload(_identity, validity, _file, _access_type, now);
         return (validity);
     }
 
@@ -266,7 +270,8 @@ contract Skizzle {
         bytes32 indexed file,
         address indexed user,
         bytes32 access_type,
-        uint256 validity
+        uint256 validity,
+        uint256 timestamp
     );
 
 
@@ -288,7 +293,7 @@ contract Skizzle {
             accessTypes[_file].is_in[_access_type] = true;
         }
         nonce[_identity]++;
-        emit NewUpdateACK(_identity, _file, _user, _access_type, _validity);
+        emit NewUpdateACK(_identity, _file, _user, _access_type, _validity, now);
         return true;
     }
 

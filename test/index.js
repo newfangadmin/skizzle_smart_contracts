@@ -229,6 +229,7 @@ describe('Signed Functions', async () => {
     updateGas("download", parseInt(await newfangDID.estimate.downloadSigned(IDs[0], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s)));
     let tx = await newfangDID.functions.downloadSigned(IDs[0], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s);
     let data = await tx.wait();
+    console.log(data.events[0]);
     let validity = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[2])));
     assert.ok(parseInt(data.events[0].args[1]) === parseInt(validity), "Wrong data");
   });
@@ -238,8 +239,7 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.changeOwnerSigned(IDs[0], accounts[9], (accounts[1]), sig.v, sig.r, sig.s);
-    await tx.wait();
+    await newfangDID.functions.changeOwnerSigned(IDs[0], accounts[9], (accounts[1]), sig.v, sig.r, sig.s);
     assert.ok(await newfangDID.owners(IDs[0]) === accounts[9], "owner do not match");
   });
 
