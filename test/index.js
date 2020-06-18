@@ -147,7 +147,7 @@ describe('Contract functions', async () => {
     let tx = await newfangDID.connect(provider.getSigner(accounts[2])).functions.download(IDs[0], AccessTypes["read"]);
     let data = await tx.wait();
     let validity = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[2]));
-    assert.ok(parseInt(data.events[0].args[1]) === parseInt(validity), "Wrong data");
+    assert.ok(parseInt(data.events[0].args.validity) === parseInt(validity), "Wrong data");
   });
 
   it('Change File Owner', async () => {
@@ -229,9 +229,9 @@ describe('Signed Functions', async () => {
     updateGas("download", parseInt(await newfangDID.estimate.downloadSigned(IDs[0], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s)));
     let tx = await newfangDID.functions.downloadSigned(IDs[0], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s);
     let data = await tx.wait();
-    console.log(data.events[0]);
+    // console.log(data.events[0]);
     let validity = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[2])));
-    assert.ok(parseInt(data.events[0].args[1]) === parseInt(validity), "Wrong data");
+    assert.ok(parseInt(data.events[0].args.validity) === parseInt(validity), "Wrong data");
   });
 
   it('Change Owner Signed', async () => {
