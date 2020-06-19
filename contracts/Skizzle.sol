@@ -241,7 +241,9 @@ contract Skizzle is Initializable {
     );
 
 
-    function download(address _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256){
+    function downloadSigned(bytes32 _file, bytes32 _access_type, address signer, uint8 v, bytes32 r, bytes32 s) public returns (uint256) {
+        bytes32 payloadHash = keccak256(abi.encode(_file, _access_type, nonce[signer]));
+        address _identity = getSigner(payloadHash, signer, v, r, s);
         uint256 validity = accessSpecifier[_file][_access_type][_identity];
         if (_identity == owners[_file]) {
             validity = now.add(1000000);
@@ -251,21 +253,6 @@ contract Skizzle is Initializable {
         nonce[_identity]++;
         emit NewDownload(_identity, _file, validity, _access_type);
         return (validity);
-    }
-
-
-    /**
-    * @dev Fetch ACK hash of user
-    * @return encrypted hash and validity
-    */
-    function download(bytes32 _file, bytes32 _access_type) public returns (uint256){
-        return download(msg.sender, _file, _access_type);
-    }
-
-    function downloadSigned(bytes32 _file, bytes32 _access_type, address signer, uint8 v, bytes32 r, bytes32 s) public returns (uint256) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _access_type, nonce[signer]));
-        address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return download(actualSigner, _file, _access_type);
     }
 
 
