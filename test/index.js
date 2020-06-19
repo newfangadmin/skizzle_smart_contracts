@@ -356,5 +356,4 @@ describe('Signed Functions', async () => {
     assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && ethers.utils.toUtf8String(file.ueb) === ueb_string, "File attributes don't match");
   });
 
-
 });
