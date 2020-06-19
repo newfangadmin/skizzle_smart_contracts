@@ -1,8 +1,10 @@
 pragma solidity ^0.5;
 
 import './SafeMath.sol';
+import './Initializable.sol';
 
-contract Skizzle {
+contract Skizzle is Initializable {
+    address public owner;
     using SafeMath for uint;
     bytes32 public log;
 
@@ -16,6 +18,7 @@ contract Skizzle {
     mapping(bytes32 => File) public files;
     mapping(bytes32 => Access) accessTypes;
     mapping(address => Usage[]) usages;
+    address[] public nodes;
 
     // similar to sets
     struct Access {
@@ -41,6 +44,23 @@ contract Skizzle {
         _;
     }
 
+    modifier onlyOwner(){
+        require(msg.sender == owner);
+        _;
+    }
+
+    function initialize(address sender, address[] memory _nodes) public initializer {
+        owner = sender;
+        nodes = _nodes;
+    }
+
+    function addNode(address _node) public onlyOwner {
+        nodes.push(_node);
+    }
+
+    function deleteNode() public onlyOwner{
+        delete nodes;
+    }
 
     function getSigner(bytes32 payloadHash, address signer, uint8 v, bytes32 r, bytes32 s) public pure returns (address){
         bytes32 messageHash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n32", payloadHash));
@@ -232,7 +252,7 @@ contract Skizzle {
     function download(address _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256){
         uint256 validity = accessSpecifier[_file][_access_type][_identity];
         if (_identity == owners[_file]) {
-            validity =  now.add(1000000);
+            validity = now.add(1000000);
         } else {
             require(validity != uint256(0), "Validity is 0");
         }
