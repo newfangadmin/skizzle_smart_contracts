@@ -3,7 +3,7 @@ node_modules
 package-lock.json
 yarn.lock
 dist
-build
+
 tenderly.yaml
 config.json
 # Created by https://www.gitignore.io/api/jetbrains+all
