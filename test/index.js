@@ -143,11 +143,18 @@ describe('Contract functions', async () => {
     }
   });
 
-  it('Get Key hash', async () => {
+  it('Download', async () => {
     let tx = await newfangDID.connect(provider.getSigner(accounts[2])).functions.download(IDs[0], AccessTypes["read"]);
     let data = await tx.wait();
     let validity = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[2]));
     assert.ok(parseInt(data.events[0].args.validity) === parseInt(validity), "Wrong data");
+  });
+
+  it('Download with owner', async () => {
+    let tx = await newfangDID.connect(provider.getSigner(await newfangDID.functions.owners(IDs[0]))).functions.download(IDs[0], AccessTypes["read"]);
+    let data = await tx.wait();
+    let validity = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], (accounts[2]));
+    assert.ok(parseInt(data.events[0].args.validity) !== 0, "Wrong data");
   });
 
   it('Change File Owner', async () => {
@@ -221,7 +228,7 @@ describe('Contract functions', async () => {
 });
 
 describe('Signed Functions', async () => {
-  it('Get Key hash Signed', async () => {
+  it('Download Signed', async () => {
     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[0], AccessTypes.read, await newfangDID.functions.nonce((accounts[2]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[2]).signMessage(ethers.utils.arrayify(payloadHash));
@@ -272,7 +279,7 @@ describe('Signed Functions', async () => {
       [AccessTypes.read],
       [120],
       (accounts[1]), sig.v, sig.r, sig.s);
-    updateGas("share",parseInt(gas));
+    updateGas("share", parseInt(gas));
     let tx = await newfangDID.functions.shareSigned(
       [IDs[2]],
       [(accounts[1])],
@@ -301,7 +308,7 @@ describe('Signed Functions', async () => {
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
     let gas = await newfangDID.estimate.updateACKSigned(IDs[2], (accounts[1]), AccessTypes["read"], 0, (accounts[1]), sig.v, sig.r, sig.s);
-    updateGas("revoke",parseInt(gas));
+    updateGas("revoke", parseInt(gas));
     let tx = await newfangDID.functions.updateACKSigned(IDs[2], (accounts[1]), AccessTypes["read"], 0, (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[1])));
@@ -341,7 +348,7 @@ describe('Signed Functions', async () => {
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
     let gas = await newfangDID.estimate.uploadSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
-    updateGas("upload",parseInt(gas));
+    updateGas("upload", parseInt(gas));
     let tx = await newfangDID.functions.uploadSigned(IDs[3], n, k, file_size, ueb, (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     let file = (await newfangDID.functions.files(IDs[3]));

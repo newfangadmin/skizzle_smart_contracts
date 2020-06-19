@@ -231,9 +231,13 @@ contract Skizzle {
 
     function download(address _identity, bytes32 _file, bytes32 _access_type) internal returns (uint256){
         uint256 validity = accessSpecifier[_file][_access_type][_identity];
-        require(validity != uint256(0), "Validity is 0");
+        if (_identity == owners[_file]) {
+            validity =  now.add(1000000);
+        } else {
+            require(validity != uint256(0), "Validity is 0");
+        }
         nonce[_identity]++;
-        emit NewDownload(_identity, _file, validity,_access_type);
+        emit NewDownload(_identity, _file, validity, _access_type);
         return (validity);
     }
 

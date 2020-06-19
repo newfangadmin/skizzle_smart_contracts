@@ -1,11 +1,11 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0x99c691E9592255673AB5CB3a2497B25ef77206d3",
-      "constructorCode": "608060405234801561001057600080fd5b50613bf8806100206000396000f3fe",
-      "bodyBytecodeHash": "96841b4c3bf4b46a3f7d5df337ef2effddc9f26e49fd84a951957826109737c7",
-      "localBytecodeHash": "347339d787293408365fe7abb3beffde7225d9748ed17e08f12937528454ea21",
-      "deployedBytecodeHash": "347339d787293408365fe7abb3beffde7225d9748ed17e08f12937528454ea21",
+      "address": "0xaCa15889DA1deFB491291bE2A5bDba1BEdfC0ac4",
+      "constructorCode": "608060405234801561001057600080fd5b50613c52806100206000396000f3fe",
+      "bodyBytecodeHash": "ddd7c3abe92e0c0b1fd12a5e2e93940cea28600deb842f75179ee17a533bd562",
+      "localBytecodeHash": "7fb128087ff5785006ad62ca8d194147fdb218db131b6b7337c8db03b1eeda90",
+      "deployedBytecodeHash": "7fb128087ff5785006ad62ca8d194147fdb218db131b6b7337c8db03b1eeda90",
       "types": {
         "t_bytes32": {
           "id": "t_bytes32",
@@ -248,19 +248,19 @@
   },
   "solidityLibs": {},
   "proxies": {
-    "skizzle_smart_contracts/Skizzle": [
+    "#/Skizzle": [
       {
-        "address": "0xf6cA67cC19435A64a8D9911cF39Dc39dB63Ae1c8",
-        "version": "1.0.0",
-        "implementation": "0x99c691E9592255673AB5CB3a2497B25ef77206d3",
-        "admin": "0x73861A6C82C9342E30744353216D1f597642AD71",
+        "address": "0x525185c73426d33D43d8c7F9C03e87B3767D442a",
+        "version": "crates",
+        "implementation": "0xaCa15889DA1deFB491291bE2A5bDba1BEdfC0ac4",
+        "admin": "0x73700B634a797AAC4F9fc88dD6899b5AB1811204",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "1.0.0",
+  "version": "crates",
   "proxyAdmin": {
-    "address": "0x73861A6C82C9342E30744353216D1f597642AD71"
+    "address": "0x73700B634a797AAC4F9fc88dD6899b5AB1811204"
   }
 }
