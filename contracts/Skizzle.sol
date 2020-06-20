@@ -105,7 +105,10 @@ contract Skizzle is Initializable {
         bytes32 indexed file
     );
 
-    function deleteFile(bytes32 _id, address _identity) internal returns (bool) {
+
+    function deleteFileSigned(bytes32 _id, address signer, uint8 v, bytes32 r, bytes32 s) public onlyNode {
+        bytes32 payloadHash = keccak256(abi.encode(_id, nonce[signer]));
+        address _identity = getSigner(payloadHash, signer, v, r, s);
         require(owners[_id] == _identity, "Owner does not match");
 
         // Remove access of all the users
@@ -129,17 +132,6 @@ contract Skizzle is Initializable {
 
         nonce[_identity]++;
         emit deleteFileEvent(_identity, _id);
-        return true;
-    }
-
-    function deleteFile(bytes32 _id) public returns (bool){
-        return deleteFile(_id, msg.sender);
-    }
-
-    function deleteFileSigned(bytes32 _id, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
-        bytes32 payloadHash = keccak256(abi.encode(_id, nonce[signer]));
-        address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return deleteFile(_id, actualSigner);
     }
 
 
@@ -183,7 +175,9 @@ contract Skizzle is Initializable {
      contract along with its validity
     * @return bool
     */
-    function share(address _identity, bytes32[] memory _files, address[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity) internal returns (bool){
+    function shareSigned(bytes32[] memory _files, address[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity, address signer, uint8 v, bytes32 r, bytes32 s) onlyNode public {
+        bytes32 payloadHash = keccak256(abi.encode(_files, _user, _access_type, _validity, nonce[signer]));
+        address _identity = getSigner(payloadHash, signer, v, r, s);
         for (uint j = 0; j < _files.length; j++) {
             for (uint i = 0; i < _user.length; i++) {
                 require(_identity == owners[_files[j]]);
@@ -200,20 +194,7 @@ contract Skizzle is Initializable {
 
             }
         }
-
         nonce[_identity]++;
-        return true;
-    }
-
-    function share(bytes32[] memory _file, address[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity) public returns (bool){
-        return share(msg.sender, _file, _user, _access_type, _validity);
-    }
-
-
-    function shareSigned(bytes32[] memory _file, address[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _validity, nonce[signer]));
-        address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return share(actualSigner, _file, _user, _access_type, _validity);
     }
 
     event NewFileUpdate(
@@ -241,7 +222,7 @@ contract Skizzle is Initializable {
     );
 
 
-    function downloadSigned(bytes32 _file, bytes32 _access_type, address signer, uint8 v, bytes32 r, bytes32 s) public returns (uint256) {
+    function downloadSigned(bytes32 _file, bytes32 _access_type, address signer, uint8 v, bytes32 r, bytes32 s) onlyNode public returns (uint256) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _access_type, nonce[signer]));
         address _identity = getSigner(payloadHash, signer, v, r, s);
         uint256 validity = accessSpecifier[_file][_access_type][_identity];
@@ -252,7 +233,7 @@ contract Skizzle is Initializable {
         }
         nonce[_identity]++;
         emit NewDownload(_identity, _file, validity, _access_type);
-        return (validity);
+        return validity;
     }
 
 
@@ -278,7 +259,9 @@ contract Skizzle is Initializable {
     file again with desired access type and you may remove the previous access type
     * @return bool
     */
-    function updateACK(address _identity, bytes32 _file, address _user, bytes32 _access_type, uint256 _validity) internal onlyFileOwner(_file, _identity) returns (bool){
+    function updateACKSigned(bytes32 _file, address _user, bytes32 _access_type, uint256 _validity, address signer, uint8 v, bytes32 r, bytes32 s) onlyNode public {
+        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _validity, nonce[signer]));
+        address _identity = getSigner(payloadHash, signer, v, r, s);
         accessSpecifier[_file][_access_type][_user] = now.add(_validity);
         if (_validity == 0) {
             delete accessSpecifier[_file][_access_type][_user];
@@ -292,17 +275,6 @@ contract Skizzle is Initializable {
         }
         nonce[_identity]++;
         emit NewUpdateACK(_identity, _file, _user, _access_type, _validity);
-        return true;
-    }
-
-    function updateACK(bytes32 _file, address _user, bytes32 _access_type, uint256 _validity) public returns (bool){
-        return updateACK(msg.sender, _file, _user, _access_type, _validity);
-    }
-
-    function updateACKSigned(bytes32 _file, address _user, bytes32 _access_type, uint256 _validity, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _validity, nonce[signer]));
-        address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return updateACK(actualSigner, _file, _user, _access_type, _validity);
     }
 
 
@@ -318,11 +290,7 @@ contract Skizzle is Initializable {
         return true;
     }
 
-    function changeFileOwner(bytes32 _file, address _new_owner) public returns (bool){
-        return changeFileOwner(msg.sender, _file, _new_owner);
-    }
-
-    function changeOwnerSigned(bytes32 _file, address _new_owner, address signer, uint8 v, bytes32 r, bytes32 s) public returns (bool) {
+    function changeOwnerSigned(bytes32 _file, address _new_owner, address signer, uint8 v, bytes32 r, bytes32 s) onlyNode public returns (bool) {
         bytes32 payloadHash = keccak256(abi.encode(_file, _new_owner, nonce[signer]));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
         return changeFileOwner(actualSigner, _file, _new_owner);
