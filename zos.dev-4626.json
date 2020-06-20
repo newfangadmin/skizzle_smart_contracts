@@ -1,32 +1,44 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0xaCa15889DA1deFB491291bE2A5bDba1BEdfC0ac4",
-      "constructorCode": "608060405234801561001057600080fd5b50613c52806100206000396000f3fe",
-      "bodyBytecodeHash": "ddd7c3abe92e0c0b1fd12a5e2e93940cea28600deb842f75179ee17a533bd562",
-      "localBytecodeHash": "7fb128087ff5785006ad62ca8d194147fdb218db131b6b7337c8db03b1eeda90",
-      "deployedBytecodeHash": "7fb128087ff5785006ad62ca8d194147fdb218db131b6b7337c8db03b1eeda90",
+      "address": "0x1e7b35413c2193735B67093d9Ace81A23579D20A",
+      "constructorCode": "608060405234801561001057600080fd5b50613bb8806100206000396000f3fe",
+      "bodyBytecodeHash": "676077249ced75b3b67931794d45c3e52fd817a3f7eaad55270f9abedc74ae70",
+      "localBytecodeHash": "ac58adf8b3b77f675871d1935953722ce2aaaf80a5c70a7636809d1e84d3e372",
+      "deployedBytecodeHash": "ac58adf8b3b77f675871d1935953722ce2aaaf80a5c70a7636809d1e84d3e372",
       "types": {
-        "t_bytes32": {
-          "id": "t_bytes32",
+        "t_bool": {
+          "id": "t_bool",
           "kind": "elementary",
-          "label": "bytes32"
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
         },
         "t_address": {
           "id": "t_address",
           "kind": "elementary",
           "label": "address"
         },
+        "t_bytes32": {
+          "id": "t_bytes32",
+          "kind": "elementary",
+          "label": "bytes32"
+        },
         "t_mapping<t_address>": {
           "id": "t_mapping<t_address>",
           "valueType": "t_address",
           "label": "mapping(key => address)",
           "kind": "mapping"
-        },
-        "t_uint256": {
-          "id": "t_uint256",
-          "kind": "elementary",
-          "label": "uint256"
         },
         "t_mapping<t_uint256>": {
           "id": "t_mapping<t_uint256>",
@@ -54,27 +66,33 @@
           "members": [
             {
               "label": "n",
-              "astId": 277,
+              "astId": 354,
               "type": "t_uint256",
-              "src": "862:9:2"
+              "src": "963:9:3"
             },
             {
               "label": "k",
-              "astId": 279,
+              "astId": 356,
               "type": "t_uint256",
-              "src": "881:9:2"
+              "src": "982:9:3"
             },
             {
               "label": "file_size",
-              "astId": 281,
+              "astId": 358,
               "type": "t_uint256",
-              "src": "900:17:2"
+              "src": "1001:17:3"
+            },
+            {
+              "label": "handling_node",
+              "astId": 360,
+              "type": "t_address",
+              "src": "1028:21:3"
             },
             {
               "label": "ueb",
-              "astId": 283,
+              "astId": 362,
               "type": "t_bytes",
-              "src": "927:9:2"
+              "src": "1059:9:3"
             }
           ]
         },
@@ -96,15 +114,15 @@
           "members": [
             {
               "label": "types",
-              "astId": 270,
+              "astId": 347,
               "type": "t_array:dyn<t_bytes32>",
-              "src": "772:15:2"
+              "src": "873:15:3"
             },
             {
               "label": "is_in",
-              "astId": 274,
+              "astId": 351,
               "type": "t_mapping<t_bool>",
-              "src": "797:30:2"
+              "src": "898:30:3"
             }
           ]
         },
@@ -114,11 +132,6 @@
           "length": "dyn",
           "kind": "array",
           "label": "bytes32[]"
-        },
-        "t_bool": {
-          "id": "t_bool",
-          "kind": "elementary",
-          "label": "bool"
         },
         "t_mapping<t_bool>": {
           "id": "t_mapping<t_bool>",
@@ -139,21 +152,21 @@
           "members": [
             {
               "label": "total_bytes",
-              "astId": 286,
+              "astId": 365,
               "type": "t_uint256",
-              "src": "972:19:2"
+              "src": "1104:19:3"
             },
             {
               "label": "usage_type",
-              "astId": 288,
+              "astId": 367,
               "type": "t_bytes32",
-              "src": "1001:18:2"
+              "src": "1133:18:3"
             },
             {
               "label": "file",
-              "astId": 290,
+              "astId": 369,
               "type": "t_bytes32",
-              "src": "1059:12:2"
+              "src": "1191:12:3"
             }
           ]
         },
@@ -173,68 +186,108 @@
       },
       "storage": [
         {
+          "contract": "Initializable",
+          "path": "contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 3,
+          "type": "t_bool",
+          "src": "756:24:0"
+        },
+        {
+          "contract": "Initializable",
+          "path": "contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5,
+          "type": "t_bool",
+          "src": "883:25:0"
+        },
+        {
+          "contract": "Initializable",
+          "path": "contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 67,
+          "type": "t_array:50<t_uint256>",
+          "src": "2089:29:0"
+        },
+        {
+          "contract": "Skizzle",
+          "path": "contracts/Skizzle.sol",
+          "label": "owner",
+          "astId": 300,
+          "type": "t_address",
+          "src": "119:20:3"
+        },
+        {
           "contract": "Skizzle",
           "path": "contracts/Skizzle.sol",
           "label": "log",
-          "astId": 231,
+          "astId": 305,
           "type": "t_bytes32",
-          "src": "101:18:2"
+          "src": "174:18:3"
         },
         {
           "contract": "Skizzle",
           "path": "contracts/Skizzle.sol",
           "label": "owners",
-          "astId": 235,
+          "astId": 309,
           "type": "t_mapping<t_address>",
-          "src": "194:41:2"
+          "src": "267:41:3"
         },
         {
           "contract": "Skizzle",
           "path": "contracts/Skizzle.sol",
           "label": "accessSpecifier",
-          "astId": 243,
+          "astId": 317,
           "type": "t_mapping<t_uint256>",
-          "src": "306:90:2"
+          "src": "379:90:3"
         },
         {
           "contract": "Skizzle",
           "path": "contracts/Skizzle.sol",
           "label": "userAccess",
-          "astId": 250,
+          "astId": 324,
           "type": "t_mapping<t_array:dyn<t_address>>",
-          "src": "481:67:2"
+          "src": "554:67:3"
         },
         {
           "contract": "Skizzle",
           "path": "contracts/Skizzle.sol",
           "label": "nonce",
-          "astId": 254,
+          "astId": 328,
           "type": "t_mapping<t_uint256>",
-          "src": "554:37:2"
+          "src": "627:37:3"
         },
         {
           "contract": "Skizzle",
           "path": "contracts/Skizzle.sol",
           "label": "files",
-          "astId": 258,
+          "astId": 332,
           "type": "t_mapping<t_struct<Skizzle.File>>",
-          "src": "597:37:2"
+          "src": "670:37:3"
         },
         {
           "contract": "Skizzle",
           "path": "contracts/Skizzle.sol",
           "label": "accessTypes",
-          "astId": 262,
+          "astId": 336,
           "type": "t_mapping<t_struct<Skizzle.Access>>",
-          "src": "640:38:2"
+          "src": "713:38:3"
         },
         {
           "contract": "Skizzle",
           "path": "contracts/Skizzle.sol",
           "label": "usages",
-          "astId": 267,
+          "astId": 341,
           "type": "t_mapping<t_array:dyn<t_struct<Skizzle.Usage>>>",
-          "src": "684:34:2"
+          "src": "757:34:3"
+        },
+        {
+          "contract": "Skizzle",
+          "path": "contracts/Skizzle.sol",
+          "label": "nodes",
+          "astId": 344,
+          "type": "t_array:dyn<t_address>",
+          "src": "797:22:3"
         }
       ],
       "warnings": {
@@ -248,19 +301,19 @@
   },
   "solidityLibs": {},
   "proxies": {
-    "#/Skizzle": [
+    "skizzle_smart_contracts/Skizzle": [
       {
-        "address": "0x525185c73426d33D43d8c7F9C03e87B3767D442a",
-        "version": "crates",
-        "implementation": "0xaCa15889DA1deFB491291bE2A5bDba1BEdfC0ac4",
-        "admin": "0x73700B634a797AAC4F9fc88dD6899b5AB1811204",
+        "address": "0x16EC3ad7bc3a3177916Bfb58B1A223aEe70CfAE9",
+        "version": "1.0.0",
+        "implementation": "0x1e7b35413c2193735B67093d9Ace81A23579D20A",
+        "admin": "0xDB66b008dE16b36e2EccF5B0Ac37E5e1db95Ad84",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "crates",
+  "version": "1.0.0",
   "proxyAdmin": {
-    "address": "0x73700B634a797AAC4F9fc88dD6899b5AB1811204"
+    "address": "0xDB66b008dE16b36e2EccF5B0Ac37E5e1db95Ad84"
   }
 }

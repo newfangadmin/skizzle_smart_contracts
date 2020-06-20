@@ -63,8 +63,9 @@ contract Skizzle is Initializable {
     }
 
 
-    function initialize(address sender) public initializer {
-        owner = sender;
+    function initialize(address[] memory _nodes) public initializer {
+        owner = msg.sender;
+        nodes = _nodes;
     }
 
     function total_nodes() view public returns(uint256){

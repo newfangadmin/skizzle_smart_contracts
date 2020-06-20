@@ -149,8 +149,6 @@ Coming Soon!
 - [Newfang DID Resolver](https://github.com/newfangadmin/newfang_did_resolver)
 - [Privacy by Design](https://en.wikipedia.org/wiki/Privacy_by_design)
 
-## Steps to upgrade the contract
-+ truffle compile
 
 ## Deploying proxy smart contract
 ```shell script
@@ -161,12 +159,5 @@ zos create Skizzle --network private
 ```
 ## Node List
 ```json
-[
-    "0x85dC57e32ce816d733D184252140E5230292b236",
-    "0x058ed96E9e02fbe6a1b7b04d4dA1E529841187E1",
-    "0xA0013c6B1576cC482C03d108Cb51c03467cA86aC",
-    "0xf5d37b2681D0A867849A33b1c4C656086962b2F0",
-    "0x2BBF87A6B75D20DF4C5666b76c1d21f3563dB87a",
-    "0x9D719DE41003f2BAE4c5a04cb33B435a68Ee13af"
-    ]
+["0x85dC57e32ce816d733D184252140E5230292b236","0x058ed96E9e02fbe6a1b7b04d4dA1E529841187E1","0xA0013c6B1576cC482C03d108Cb51c03467cA86aC","0xf5d37b2681D0A867849A33b1c4C656086962b2F0","0x2BBF87A6B75D20DF4C5666b76c1d21f3563dB87a","0x9D719DE41003f2BAE4c5a04cb33B435a68Ee13af"]
 ```
