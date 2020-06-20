@@ -248,10 +248,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1594,
-                        1595
+                        1596,
+                        1597
                       ],
-                      "referencedDeclaration": 1595,
+                      "referencedDeclaration": 1597,
                       "src": "1035:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
@@ -615,7 +615,7 @@
                         "name": "this",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1605,
+                        "referencedDeclaration": 1607,
                         "src": "1911:4:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_contract$_Initializable_$68",
@@ -1133,10 +1133,10 @@
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
-                        1594,
-                        1595
+                        1596,
+                        1597
                       ],
-                      "referencedDeclaration": 1595,
+                      "referencedDeclaration": 1597,
                       "src": "1035:7:0",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
@@ -1500,7 +1500,7 @@
                         "name": "this",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1605,
+                        "referencedDeclaration": 1607,
                         "src": "1911:4:0",
                         "typeDescriptions": {
                           "typeIdentifier": "t_contract$_Initializable_$68",
@@ -1784,7 +1784,7 @@
   },
   "networks": {},
   "schemaVersion": "3.1.0",
-  "updatedAt": "2020-06-20T06:22:04.693Z",
+  "updatedAt": "2020-06-20T11:28:55.352Z",
   "devdoc": {
     "details": "Helper contract to support initializer functions. To use it, replace the constructor with a function that has the `initializer` modifier. WARNING: Unlike constructors, initializer functions must be manually invoked. This applies both to deploying an Initializable contract, as well as extending an Initializable contract via inheritance. WARNING: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or ensure that all initializers are idempotent, because this is not dealt with automatically as with constructors.",
     "methods": {},

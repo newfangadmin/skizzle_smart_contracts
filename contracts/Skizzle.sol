@@ -88,7 +88,7 @@ contract Skizzle is Initializable {
     }
 
 
-    function createDIDSigned(bytes32 _file, uint256 n, uint256 k, uint256 _file_size, address signer, uint8 v, bytes32 r, bytes32 s) public {
+    function createDIDSigned(bytes32 _file, uint256 n, uint256 k, uint256 _file_size, address signer, uint8 v, bytes32 r, bytes32 s) public onlyNode {
         require(owners[_file] == address(0), "Owner already exist for this file");
         require(n <= nodes.length, "N should be less then number of total nodes");
         require(n > k, "n>k");

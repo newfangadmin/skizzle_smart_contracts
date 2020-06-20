@@ -1,11 +1,11 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0x1e7b35413c2193735B67093d9Ace81A23579D20A",
-      "constructorCode": "608060405234801561001057600080fd5b50613bb8806100206000396000f3fe",
-      "bodyBytecodeHash": "676077249ced75b3b67931794d45c3e52fd817a3f7eaad55270f9abedc74ae70",
-      "localBytecodeHash": "ac58adf8b3b77f675871d1935953722ce2aaaf80a5c70a7636809d1e84d3e372",
-      "deployedBytecodeHash": "ac58adf8b3b77f675871d1935953722ce2aaaf80a5c70a7636809d1e84d3e372",
+      "address": "0xD7E9b6A96DD41eC2c5542C1E8D240000039BB529",
+      "constructorCode": "608060405234801561001057600080fd5b50613c5d806100206000396000f3fe",
+      "bodyBytecodeHash": "dd4a822601db20d7c273acdba0e3ea31089b3b3996032408d4872c3dfbfde91e",
+      "localBytecodeHash": "4cb5f3edb1bd6464fb7001799ff7041f281abdf7c819dfe26d43e9d6633fdf1d",
+      "deployedBytecodeHash": "4cb5f3edb1bd6464fb7001799ff7041f281abdf7c819dfe26d43e9d6633fdf1d",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -301,19 +301,19 @@
   },
   "solidityLibs": {},
   "proxies": {
-    "skizzle_smart_contracts/Skizzle": [
+    "#/Skizzle": [
       {
-        "address": "0x16EC3ad7bc3a3177916Bfb58B1A223aEe70CfAE9",
-        "version": "1.0.0",
-        "implementation": "0x1e7b35413c2193735B67093d9Ace81A23579D20A",
-        "admin": "0xDB66b008dE16b36e2EccF5B0Ac37E5e1db95Ad84",
+        "address": "0x9f0220686128dCFFE6d18Ee46188c9c82717FE4D",
+        "version": "crates",
+        "implementation": "0xD7E9b6A96DD41eC2c5542C1E8D240000039BB529",
+        "admin": "0xF3b22b71F534F6aa6EEfae0dBB7b53e693b8BC07",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "1.0.0",
+  "version": "crates",
   "proxyAdmin": {
-    "address": "0xDB66b008dE16b36e2EccF5B0Ac37E5e1db95Ad84"
+    "address": "0xF3b22b71F534F6aa6EEfae0dBB7b53e693b8BC07"
   }
 }
