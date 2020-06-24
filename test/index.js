@@ -84,6 +84,8 @@ describe('Signed Functions', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
+    let gas = await newfangDID.estimate.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s);
+    updateGas("create did", parseInt(gas));
     let tx = await newfangDID.functions.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     assert.ok(await newfangDID.owners(IDs[2]) === (accounts[1]), "owner do not match");
@@ -91,6 +93,8 @@ describe('Signed Functions', async () => {
 
   it('Update UEB', async () => {
     let ueb = "UEB";
+    let gas = await newfangDID.estimate.fileUpdate(IDs[2], ethers.utils.toUtf8Bytes(ueb));
+    updateGas("update ueb", parseInt(gas));
     let tx = await newfangDID.fileUpdate(IDs[2], ethers.utils.toUtf8Bytes(ueb));
     await tx.wait();
     let file = await newfangDID.files(IDs[2]);
@@ -151,28 +155,31 @@ describe('Signed Functions', async () => {
   //   assert.ok(await newfangDID.owners(IDs[0]) === accounts[9], "owner do not match");
   // });
 
-  it('Update ACK Signed with non zero validity', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "uint256", "uint256"], [IDs[2], (accounts[1]), AccessTypes["read"], 10, await newfangDID.functions.nonce((accounts[1]))]);
+  it('Revoke Signed with zero validity', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "uint256"], [IDs[2], (accounts[2]), AccessTypes["read"], await newfangDID.functions.nonce((accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.updateACKSigned(IDs[2], (accounts[1]), AccessTypes["read"], 10, (accounts[1]), sig.v, sig.r, sig.s);
-    await tx.wait();
-    let ACK = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[1])));
-    assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
-  });
-
-  it('Update ACK Signed with zero validity', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "uint256", "uint256"], [IDs[2], (accounts[2]), AccessTypes["read"], 0, await newfangDID.functions.nonce((accounts[1]))]);
-    let payloadHash = ethers.utils.keccak256(payload);
-    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
-    let sig = ethers.utils.splitSignature(signature);
-    let gas = await newfangDID.estimate.updateACKSigned(IDs[2], (accounts[2]), AccessTypes["read"], 0, (accounts[1]), sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.revokeSigned(IDs[2], (accounts[2]), AccessTypes["read"], (accounts[1]), sig.v, sig.r, sig.s);
     updateGas("revoke", parseInt(gas));
-    let tx = await newfangDID.functions.updateACKSigned(IDs[2], (accounts[2]), AccessTypes["read"], 0, (accounts[1]), sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.revokeSigned(IDs[2], (accounts[2]), AccessTypes["read"], (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
     let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[2])));
-    assert.ok(parseInt(validity) === 0, "Validity can not be 0")
+    assert.ok(parseInt(validity) === 0, "Validity not 0")
+  });
+
+  it('Remove DID Signed ', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256"], [IDs[2], await newfangDID.functions.nonce((accounts[1]))]);
+    let payloadHash = ethers.utils.keccak256(payload);
+    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+    let sig = ethers.utils.splitSignature(signature);
+    let gas = await newfangDID.estimate.deleteFileSigned(IDs[2], accounts[1], sig.v, sig.r, sig.s);
+    updateGas("delete", parseInt(gas));
+    let before = await newfangDID.version(IDs[2]);
+    let tx = await newfangDID.functions.deleteFileSigned(IDs[2], accounts[1], sig.v, sig.r, sig.s);
+    await tx.wait();
+    let after = await newfangDID.version(IDs[2]);
+    assert.ok(after - before === 1, "Version not decreased");
   });
 
 });
