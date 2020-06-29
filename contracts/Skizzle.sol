@@ -67,7 +67,7 @@ contract Skizzle is Initializable {
         owner = msg.sender;
         for (uint256 i = 0; i < _nodes.length; i++) {
             total_nodes++;
-            isNode[msg.sender] = true;
+            isNode[_nodes[i]] = true;
         }
     }
 
@@ -177,6 +177,7 @@ contract Skizzle is Initializable {
         require(msg.sender == file.handling_node, "Function can only be called by handling node");
         require(file.ueb.length == 0);
         file.ueb = ueb;
+        isDeleted[_file] = false;
         emit NewFileUpdate(owners[_file], _file, file.n, file.k, file.file_size, ueb);
         return true;
     }

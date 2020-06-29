@@ -98,6 +98,7 @@ describe('Signed Functions', async () => {
     let tx = await newfangDID.fileUpdate(IDs[2], ethers.utils.toUtf8Bytes(ueb));
     await tx.wait();
     let file = await newfangDID.files(IDs[2]);
+    assert.ok(!(await newfangDID.isDeleted(IDs[2])), "File status is deleted");
     assert.ok(ethers.utils.toUtf8String(file.ueb) === ueb, "UEB doesn't match");
   });
 
@@ -180,6 +181,8 @@ describe('Signed Functions', async () => {
     await tx.wait();
     let after = await newfangDID.version(IDs[2]);
     assert.ok(after - before === 1, "Version not decreased");
+    assert.ok(await newfangDID.owners(IDs[2]) === "0x0000000000000000000000000000000000000000", "Owner not removed");
+    assert.ok(await newfangDID.isDeleted(IDs[2]), "Deleted status not changed")
   });
 
 });
