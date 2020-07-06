@@ -29880,10 +29880,16 @@
       "events": {},
       "address": "0x373E623D1153F38Ef1AeceA7c26F1ae8583987B7",
       "updated_at": 1593157305708
+    },
+    "80001": {
+      "links": {},
+      "events": {},
+      "address": "0x961D3860d840D6ACCeAA302fbF5C0bb83b801bb4",
+      "updated_at": 1594054215561
     }
   },
   "schemaVersion": "3.1.0",
-  "updatedAt": "2020-06-26T07:41:12.780Z",
+  "updatedAt": "2020-07-06T16:49:30.864Z",
   "devdoc": {
     "methods": {
       "revokeSigned(bytes32,address,bytes32,address,uint8,bytes32,bytes32)": {

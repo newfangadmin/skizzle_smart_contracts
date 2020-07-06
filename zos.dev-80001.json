@@ -1,7 +1,7 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0x456CB2d0b534dfccf2347B189C5a7252a06F0041",
+      "address": "0x3bEb087e33eC0B830325991A32E3F8bb16A51317",
       "constructorCode": "608060405234801561001057600080fd5b5061380a806100206000396000f3fe",
       "bodyBytecodeHash": "6706349139a1e23de0b74ce4edf5e6ae3ea5d48e2e00801267b4ca465dc29da3",
       "localBytecodeHash": "5cb6dc629b788c573cfa36076668f6f94586939549bcc38378705cb0481c8ce6",
@@ -310,19 +310,19 @@
   },
   "solidityLibs": {},
   "proxies": {
-    "skizzle_smart_contracts/Skizzle": [
+    "#/Skizzle": [
       {
-        "address": "0x373E623D1153F38Ef1AeceA7c26F1ae8583987B7",
-        "version": "1.0.0",
-        "implementation": "0x456CB2d0b534dfccf2347B189C5a7252a06F0041",
-        "admin": "0x936804ac6f5c1eeB6d9d1DA58CB7C7783238DD5C",
+        "address": "0x961D3860d840D6ACCeAA302fbF5C0bb83b801bb4",
+        "version": "crates",
+        "implementation": "0x3bEb087e33eC0B830325991A32E3F8bb16A51317",
+        "admin": "0xc4cfb05119Ea1F59fb5a8F949288801491D00110",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "1.0.0",
+  "version": "crates",
   "proxyAdmin": {
-    "address": "0x936804ac6f5c1eeB6d9d1DA58CB7C7783238DD5C"
+    "address": "0xc4cfb05119Ea1F59fb5a8F949288801491D00110"
   }
 }
