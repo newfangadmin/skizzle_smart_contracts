@@ -79,24 +79,16 @@ describe('Contract initialization, DID creation', async () => {
 
 describe('Signed Functions', async () => {
   it('Create DID Signed', async () => {
-    let n = 6, k = 4, file_size = 1200;
+    let n = 6, k = 4, file_size = 1200, ueb = "UEB";
     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "uint256"], [IDs[2], n, k, file_size, await newfangDID.functions.nonce((accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let gas = await newfangDID.estimate.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s, ethers.utils.toUtf8Bytes(ueb));
     updateGas("create did", parseInt(gas));
-    let tx = await newfangDID.functions.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s, ethers.utils.toUtf8Bytes(ueb));
     await tx.wait();
     assert.ok(await newfangDID.owners(IDs[2]) === (accounts[1]), "owner do not match");
-  });
-
-  it('Update UEB', async () => {
-    let ueb = "UEB";
-    let gas = await newfangDID.estimate.fileUpdate(IDs[2], ethers.utils.toUtf8Bytes(ueb));
-    updateGas("update ueb", parseInt(gas));
-    let tx = await newfangDID.fileUpdate(IDs[2], ethers.utils.toUtf8Bytes(ueb));
-    await tx.wait();
     let file = await newfangDID.files(IDs[2]);
     assert.ok(!(await newfangDID.isDeleted(IDs[2])), "File status is deleted");
     assert.ok(ethers.utils.toUtf8String(file.ueb) === ueb, "UEB doesn't match");

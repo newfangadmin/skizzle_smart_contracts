@@ -1,11 +1,11 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0x3bEb087e33eC0B830325991A32E3F8bb16A51317",
-      "constructorCode": "608060405234801561001057600080fd5b5061380a806100206000396000f3fe",
-      "bodyBytecodeHash": "6706349139a1e23de0b74ce4edf5e6ae3ea5d48e2e00801267b4ca465dc29da3",
-      "localBytecodeHash": "5cb6dc629b788c573cfa36076668f6f94586939549bcc38378705cb0481c8ce6",
-      "deployedBytecodeHash": "5cb6dc629b788c573cfa36076668f6f94586939549bcc38378705cb0481c8ce6",
+      "address": "0xcA4d0578c5e07F0964C7E7ccc87E606A234625b8",
+      "constructorCode": "608060405234801561001057600080fd5b5061352a806100206000396000f3fe",
+      "bodyBytecodeHash": "73e3af91ff129c7180fdfbecd13ad1ff9c987ffd70958a1c7f6dfd26bb348c80",
+      "localBytecodeHash": "5f411cbca74384a715c7eb35973888bfd97975e77357a719984ae64f11df66e2",
+      "deployedBytecodeHash": "5f411cbca74384a715c7eb35973888bfd97975e77357a719984ae64f11df66e2",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -312,17 +312,17 @@
   "proxies": {
     "#/Skizzle": [
       {
-        "address": "0x961D3860d840D6ACCeAA302fbF5C0bb83b801bb4",
-        "version": "crates",
-        "implementation": "0x3bEb087e33eC0B830325991A32E3F8bb16A51317",
-        "admin": "0xc4cfb05119Ea1F59fb5a8F949288801491D00110",
+        "address": "0x7F87f9830baB8A591E6f94fd1A47EE87560B0bB0",
+        "version": "creates",
+        "implementation": "0xcA4d0578c5e07F0964C7E7ccc87E606A234625b8",
+        "admin": "0x89309551Fb7AbaaB85867ACa60404CDA649751d4",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "crates",
+  "version": "creates",
   "proxyAdmin": {
-    "address": "0xc4cfb05119Ea1F59fb5a8F949288801491D00110"
+    "address": "0x89309551Fb7AbaaB85867ACa60404CDA649751d4"
   }
 }

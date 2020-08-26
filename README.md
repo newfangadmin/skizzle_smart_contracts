@@ -152,7 +152,9 @@ Coming Soon!
 
 ## Deploying proxy smart contract
 ```shell script
-zos init # crates zos.json
+rm .zos*
+rm zos*
+zos init # creates zos.json
 zos add Skizzle
 zos push --network private
 zos create Skizzle --network private

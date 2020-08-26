@@ -89,7 +89,7 @@ contract Skizzle is Initializable {
     }
 
 
-    function createDIDSigned(bytes32 _file, uint256 n, uint256 k, uint256 _file_size, address signer, uint8 v, bytes32 r, bytes32 s) public onlyNode {
+    function createDIDSigned(bytes32 _file, uint256 n, uint256 k, uint256 _file_size, address signer, uint8 v, bytes32 r, bytes32 s, bytes memory _ueb) public onlyNode {
         require(owners[_file] == address(0), "Owner already exist for this file");
         require(n <= total_nodes , "N should be less then number of total nodes");
         require(n > k, "n>k");
@@ -98,7 +98,9 @@ contract Skizzle is Initializable {
         bytes32 payloadHash = keccak256(abi.encode(_file, n, k, _file_size, nonce[signer]));
         address _identity = getSigner(payloadHash, signer, v, r, s);
         owners[_file] = _identity;
-        files[_file] = File(n, k, _file_size, msg.sender, "");
+        files[_file] = File(n, k, _file_size, msg.sender, _ueb);
+        isDeleted[_file] = false;
+        emit NewFileUpdate(owners[_file], _file, n, k, _file_size, _ueb);
         nonce[_identity]++;
     }
 
@@ -171,16 +173,6 @@ contract Skizzle is Initializable {
         uint256 file_size,
         bytes indexed ueb
     );
-
-    function fileUpdate(bytes32 _file, bytes memory ueb) public onlyNode returns (bool){
-        File storage file = files[_file];
-        require(msg.sender == file.handling_node, "Function can only be called by handling node");
-        require(file.ueb.length == 0);
-        file.ueb = ueb;
-        isDeleted[_file] = false;
-        emit NewFileUpdate(owners[_file], _file, file.n, file.k, file.file_size, ueb);
-        return true;
-    }
 
     event NewDownload(
         address indexed identity,
