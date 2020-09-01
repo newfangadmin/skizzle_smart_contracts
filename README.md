@@ -1,4 +1,5 @@
 # Newfang DID Method Specification
+[![Build Status](https://travis-ci.com/newfangadmin/skizzle_smart_contracts.svg?token=2yjAythLGDwdY1XXtyDa&branch=dev)](https://travis-ci.com/newfangadmin/skizzle_smart_contracts)
 
 # Abstract
 Newfang is a decentralized cloud storage platform with a modular decentralized access control layer that can plug into any underlying storage. The intention at Newfang is to give users back real ownership and control of their files. We hope to do this by giving every file, uploaded to Newfang, a unique, globally resolvable and decentralized id.
@@ -147,3 +148,18 @@ Coming Soon!
 - [did-core](https://w3c.github.io/did-core/)
 - [Newfang DID Resolver](https://github.com/newfangadmin/newfang_did_resolver)
 - [Privacy by Design](https://en.wikipedia.org/wiki/Privacy_by_design)
+
+
+## Deploying proxy smart contract
+```shell script
+rm .zos*
+rm zos*
+zos init # creates zos.json
+zos add Skizzle
+zos push --network private
+zos create Skizzle --network private
+```
+## Node List
+```json
+["0x85dC57e32ce816d733D184252140E5230292b236","0x058ed96E9e02fbe6a1b7b04d4dA1E529841187E1","0xA0013c6B1576cC482C03d108Cb51c03467cA86aC","0xf5d37b2681D0A867849A33b1c4C656086962b2F0","0x2BBF87A6B75D20DF4C5666b76c1d21f3563dB87a","0x9D719DE41003f2BAE4c5a04cb33B435a68Ee13af","0xaE3b8b860CB3D2dbf38f994c3595fc382d60aabF"]
+```

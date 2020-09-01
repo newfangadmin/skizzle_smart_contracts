@@ -3,27 +3,33 @@ const ethers = require('ethers');
 const config = require('../config.json');
 
 const ganache = require('ganache-cli');
-const provider = new ethers.providers.Web3Provider(ganache.provider({gasLimit: 7000000}));
+const fs = require('fs');
 
-const newfangJson = require('../build/NewfangDIDRegistry.json');
+const provider = new ethers.providers.Web3Provider(ganache.provider({gasLimit: 8000000}));
+
+const newfangJson = require('../build/contracts/Skizzle.json');
 
 let wallet, newfangDID, accounts, wallet1 = new ethers.Wallet(config.private_key);
+
+let gasFees = {};
 let IDs = [
   "0x4de0e96b0a8886e42a2c35b57df8a9d58a93b5bff655bc37a30e2ab8e29dc066",
   "0x3d725c5ee53025f027da36bea8d3af3b6a3e9d2d1542d47c162631de48e66c1c",
-  "0x967f2a2c7f3d22f9278175c1e6aa39cf9171db91dceacd5ee0f37c2e507b5abe"
+  "0x967f2a2c7f3d22f9278175c1e6aa39cf9171db91dceacd5ee0f37c2e507b5abe",
+  "0x6e65772069640000000000000000000000000000000000000000000000000000"
 ];
 
-function hash(address) {
-  let payload = ethers.utils.defaultAbiCoder.encode(["address"], [address]);
-  return ethers.utils.keccak256(payload);
-}
 
 let AccessTypes = {
   read: ethers.utils.formatBytes32String("read"),
   reshare: ethers.utils.formatBytes32String("reshare"),
   delete: ethers.utils.formatBytes32String("delete")
 };
+
+function updateGas(key, value) {
+  gasFees[key] = value;
+  fs.writeFileSync('gas.json', JSON.stringify(gasFees));
+}
 
 describe('Ganache Setup', async () => {
   it('initiates ganache and generates a bunch of demo accounts', async () => {
@@ -42,264 +48,133 @@ describe('Contract initialization, DID creation', async () => {
     );
     newfangDID = await newfangContract.deploy();
     await newfangDID.deployed();
+
+    let nodes = [
+      "0x85dC57e32ce816d733D184252140E5230292b236",
+      "0x058ed96E9e02fbe6a1b7b04d4dA1E529841187E1",
+      "0xA0013c6B1576cC482C03d108Cb51c03467cA86aC",
+      "0xf5d37b2681D0A867849A33b1c4C656086962b2F0",
+      "0x2BBF87A6B75D20DF4C5666b76c1d21f3563dB87a",
+      "0x9D719DE41003f2BAE4c5a04cb33B435a68Ee13af"
+    ];
+
+    let tx = await newfangDID.functions.initialize(nodes);
+    await tx.wait();
     assert.ok(newfangDID.address, 'Newfang DID  Register deployed');
   });
 
-  it('Create an DID', async () => {
-    let tx = await newfangDID.functions.createDID(IDs[0]);
-    await tx.wait();
-    assert.ok(await newfangDID.functions.owners(IDs[0]) === hash(await wallet.getAddress()),
-      "Owner should be the person who calls the function");
-  });
+  it('Add nodes', async () => {
 
-  it('Create an DID with same ID', async () => {
-    try {
-      let tx = await newfangDID.functions.createDID(IDs[0]);
-      await tx.wait();
-      assert(false, 'Should get an error');
-    } catch (e) {
-      assert.ok(e.message.includes('revert'), e.message)
+    let total_nodes = 6;
+    for (let i = 0; i < total_nodes; i++) {
+      let tx = await newfangDID.addNode(accounts[i]);
+      await tx.wait()
     }
-  });
+
+    assert.ok(parseInt(await newfangDID.total_nodes()) === total_nodes + 6, "Node length doesn't match");
+  })
 
 });
 
-
-describe('Contract functions', async () => {
-  it('Share a file', async () => {
-    let tx, ACK, ids = [], types = [], users = [], accessTypes = [], validity = [];
-
-    for (let i = 2; i < 8; i++) {
-      types.push(1);
-      users.push(hash(accounts[i]));
-      accessTypes.push(AccessTypes["read"]);
-      validity.push(120);
-    }
-
-    tx = await newfangDID.functions.share([IDs[0]], types, users, accessTypes, validity);
-    await tx.wait();
-
-    // Verify the changes
-    for (let i = 2; i < 8; i++) {
-
-      ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[i])));
-      assert.ok(parseInt(ACK._type) !== 0,
-        "Type hash not set");
-      assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
-    }
-
-
-    // tx = await newfangDID.updateACK(IDs[0], accounts[6], AccessTypes.read,
-    //   ethers.utils.hashMessage("asdf"), 0);
-    // await tx.wait();
-    // tx = await newfangDID.functions.share(IDs[0], accounts[6], AccessTypes["read"],
-    //   ethers.utils.hashMessage("asdf"), 120);
-    // await tx.wait();
-    let tx2 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
-    let array = tx2.filter(function (e) {
-      return e === hash(accounts[6]);
-    });
-    assert.ok(array.length === 1, `Expected 1 but got ${array.length}`);
-  });
-
-  it('share file with zero validity period', async () => {
-    try {
-      let tx = await newfangDID.functions.share([IDs[0]], [1], [hash(accounts[2])], [AccessTypes["read"]], [0]);
-      await tx.wait();
-      assert(false, 'Should get an error');
-    } catch (e) {
-      assert.ok(e.message.includes('revert'), e.message)
-    }
-  });
-
-
-  it('share file with without owning the file', async () => {
-    try {
-      let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.share([IDs[0]], [1], [hash(accounts[3])], [AccessTypes["read"]], [120]);
-      await tx.wait();
-      assert(false, 'Should get an error');
-    } catch (e) {
-      assert.ok(e.message.includes('revert'), e.message)
-    }
-  });
-
-  it('Get Key hash', async () => {
-    let tx = await newfangDID.connect(provider.getSigner(accounts[2])).functions.getKeyHash(IDs[0], AccessTypes["read"]);
-    let data = await tx.wait();
-    let ACK = await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[2]));
-    assert.ok(parseInt(data.events[0].args[0]) === parseInt(ACK._type) && parseInt(data.events[0].args[1]) === parseInt(ACK.validity), "Wrong data");
-  });
-
-  // it('Update file access', async () => {
-  //   let tx = await newfangDID.functions.share([IDs[0]], [1], [hash(accounts[1])], [AccessTypes["read"]], [0]);
-  //   await tx.wait();
-  //   let ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], accounts[1]));
-  //   assert.ok(ACK.encrypted_key === ethers.utils.hashMessage("asdfasdf"),
-  //     "encrypted key's hash not updated");
-  // });
-  //
-  // it('Share same file to same user', async () => {
-  //   try {
-  //     let tx = await newfangDID.functions.share(IDs[0], accounts[1], AccessTypes["read"],
-  //       ethers.utils.hashMessage("asdfasdf"), 120);
-  //     await tx.wait();
-  //   } catch (e) {
-  //     assert.ok(e.message.includes('revert'), e.message)
-  //   }
-  // });
-  //
-  it('Change File Owner', async () => {
-    let tx = await newfangDID.functions.changeFileOwner(IDs[0], hash(accounts[1]));
-    await tx.wait();
-    assert.ok(await newfangDID.owners(IDs[0]) === hash(accounts[1]), "owner do not match");
-  });
-  //
-  it('Get all users who has file access', async () => {
-    let tx1 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
-    let tx = await newfangDID.connect(provider.getSigner(accounts[1])).updateACK(IDs[0], 1, hash(accounts[3]), AccessTypes.read, 0);
-    await tx.wait();
-    let tx2 = await newfangDID.functions.getAllUsers(IDs[0], AccessTypes.read);
-    // console.log(tx2);
-    tx1 = tx1.filter(function (element) {
-      return element !== '0x0000000000000000000000000000000000000000000000000000000000000000';
-    });
-    tx2 = tx2.filter(function (element) {
-      return element !== '0x0000000000000000000000000000000000000000000000000000000000000000';
-    });
-    let diff = tx1.length - tx2.length;
-    // console.log(tx2,tx1, hash(accounts[3]));
-    assert.ok(diff === 1, `Expected 1 but got ${diff}`);
-  });
-
-  it('Set File attributes', async () => {
-    let n = 6;
-    let k = 3;
-    let file_size = 12;
-    let ueb = '<UEB hash>';
-    let tx = await newfangDID.connect(provider.getSigner(accounts[1])).functions.fileUpdate(IDs[0], n, k, file_size, ueb);
-    await tx.wait();
-    let file = (await newfangDID.functions.files(IDs[0]));
-    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
-  });
-
-  it('Remove DID', async () => {
-    let did_tx = await newfangDID.createDID(IDs[1]);
-    await did_tx.wait();
-
-    let share_tx1 = await newfangDID.functions.share([IDs[1]], [1], [hash(accounts[2])], [AccessTypes.read], [1200]);
-    await share_tx1.wait();
-
-
-    assert.ok(parseInt(await newfangDID.getTotalUsers(IDs[1], AccessTypes.read)) === 1, 'Invalid total read users');
-
-    let tx = await newfangDID.removeDID(IDs[1]);
-    await tx.wait();
-
-    assert.ok(parseInt(await newfangDID.getTotalUsers(IDs[1], AccessTypes.read)) === 0, 'Total users must be 0');
-    assert.ok(parseInt((await newfangDID.files(IDs[1])).k) === 0, "File still exist on blockchain");
-    assert.ok(await newfangDID.owners(IDs[1]) === "0x0000000000000000000000000000000000000000000000000000000000000000", "owner still exist");
-
-  });
-
-
-});
 
 describe('Signed Functions', async () => {
-  it('Get Key hash Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[0], AccessTypes.read, await newfangDID.functions.nonce(hash(accounts[1]))]);
-    let payloadHash = ethers.utils.keccak256(payload);
-    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
-    let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.getKeyHashSigned(IDs[0], AccessTypes.read, hash(accounts[1]), sig.v, sig.r, sig.s);
-    let data = await tx.wait();
-    let ACK = (await newfangDID.functions.accessSpecifier(IDs[0], AccessTypes["read"], hash(accounts[1])));
-    assert.ok(parseInt(data.events[0].args[0]) === parseInt(ACK._type) && parseInt(data.events[0].args[1]) === parseInt(ACK.validity), "Wrong data");
-  });
-
-  it('Change Owner Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[0], ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["string"], ["saurav@newfang.io"])), await newfangDID.functions.nonce(hash(accounts[1]))]);
-    let payloadHash = ethers.utils.keccak256(payload);
-    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
-    let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.changeOwnerSigned(IDs[0], ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["string"], ["saurav@newfang.io"])), hash(accounts[1]), sig.v, sig.r, sig.s);
-    await tx.wait();
-    assert.ok(await newfangDID.owners(IDs[0]) === ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(["string"], ["saurav@newfang.io"])), "owner do not match");
-  });
-
   it('Create DID Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256"], [IDs[2], await newfangDID.functions.nonce(hash(accounts[1]))]);
+    let n = 6, k = 4, file_size = 1200, ueb = "UEB";
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "uint256"], [IDs[2], n, k, file_size, await newfangDID.functions.nonce((accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.createDIDSigned(IDs[2], hash(accounts[1]), sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s, ethers.utils.toUtf8Bytes(ueb));
+    updateGas("create did", parseInt(gas));
+    let tx = await newfangDID.functions.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s, ethers.utils.toUtf8Bytes(ueb));
     await tx.wait();
-    assert.ok(await newfangDID.owners(IDs[2]) === hash(accounts[1]), "owner do not match");
+    assert.ok(await newfangDID.owners(IDs[2]) === (accounts[1]), "owner do not match");
+    let file = await newfangDID.files(IDs[2]);
+    assert.ok(!(await newfangDID.isDeleted(IDs[2])), "File status is deleted");
+    assert.ok(ethers.utils.toUtf8String(file.ueb) === ueb, "UEB doesn't match");
   });
+
 
   it('Share DID Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32[]", "uint256[]", "bytes32[]", "bytes32[]", "uint256[]", "uint256"],
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32[]", "address[]", "bytes32[]", "uint256[]", "uint256"],
       [
         [IDs[2]],
-        [1],
-        [hash(accounts[1])],
+        [accounts[2]],
         [AccessTypes.read],
         [120],
-        await newfangDID.functions.nonce(hash(accounts[1]))
+        await newfangDID.functions.nonce((accounts[1]))
       ]);
-    // console.log(await newfangDID.owners(IDs[2]) === hash(accounts[1]));
+    // console.log(await newfangDID.owners(IDs[2]) === (accounts[2]));
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.shareSigned(
+    let gas = await newfangDID.estimate.shareSigned(
       [IDs[2]],
-      [1],
-      [hash(accounts[1])],
+      [(accounts[2])],
       [AccessTypes.read],
       [120],
-      hash(accounts[1]), sig.v, sig.r, sig.s);
+      accounts[1], sig.v, sig.r, sig.s);
+    updateGas("share", parseInt(gas));
+    let tx = await newfangDID.functions.shareSigned(
+      [IDs[2]],
+      [(accounts[2])],
+      [AccessTypes.read],
+      [120],
+      accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
-    let ACK = await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], hash(accounts[1]));
+    let ACK = await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[2]));
     assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
   });
 
-  it('Update ACK Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], 1, hash(accounts[1]), AccessTypes["read"], 10, await newfangDID.functions.nonce(hash(accounts[1]))]);
+  it('Download Signed', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[2], AccessTypes.read, await newfangDID.functions.nonce((accounts[2]))]);
     let payloadHash = ethers.utils.keccak256(payload);
-    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+    let signature = await provider.getSigner(accounts[2]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.updateACKSigned(IDs[2], 1, hash(accounts[1]), AccessTypes["read"], 10, hash(accounts[1]), sig.v, sig.r, sig.s);
-    await tx.wait();
-    let ACK = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], hash(accounts[1])));
-    assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
+    updateGas("download", parseInt(await newfangDID.estimate.downloadSigned(IDs[2], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s)));
+    let tx = await newfangDID.functions.downloadSigned(IDs[2], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s);
+    let data = await tx.wait();
+    // console.log(data.events[0]);
+    let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[2])));
+    assert.ok(parseInt(data.events[0].args.validity) === parseInt(validity), "Wrong data");
   });
 
-  it('Update ACK Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "bytes32", "bytes32", "uint256", "uint256"], [IDs[2], 1, hash(accounts[1]), AccessTypes["read"], 0, await newfangDID.functions.nonce(hash(accounts[1]))]);
+  // it('Change Owner Signed', async () => {
+  //   let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "uint256"], [IDs[0], accounts[9], await newfangDID.functions.nonce((accounts[1]))]);
+  //   let payloadHash = ethers.utils.keccak256(payload);
+  //   let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+  //   let sig = ethers.utils.splitSignature(signature);
+  //   await newfangDID.functions.changeOwnerSigned(IDs[0], accounts[9], (accounts[1]), sig.v, sig.r, sig.s);
+  //   assert.ok(await newfangDID.owners(IDs[0]) === accounts[9], "owner do not match");
+  // });
+
+  it('Revoke Signed with zero validity', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "uint256"], [IDs[2], (accounts[2]), AccessTypes["read"], await newfangDID.functions.nonce((accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.updateACKSigned(IDs[2], 1, hash(accounts[1]), AccessTypes["read"], 0, hash(accounts[1]), sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.revokeSigned(IDs[2], (accounts[2]), AccessTypes["read"], (accounts[1]), sig.v, sig.r, sig.s);
+    updateGas("revoke", parseInt(gas));
+    let tx = await newfangDID.functions.revokeSigned(IDs[2], (accounts[2]), AccessTypes["read"], (accounts[1]), sig.v, sig.r, sig.s);
     await tx.wait();
-    let ACK = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], hash(accounts[1])));
-    assert.ok(parseInt(ACK.validity) === 0, "Validity can not be 0")
+    let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[2])));
+    assert.ok(parseInt(validity) === 0, "Validity not 0")
   });
 
-
-  it('Set File attributes Signed', async () => {
-    let n = 16;
-    let k = 13;
-    let file_size = 22;
-    let ueb = '<UEB hash>';
-
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "string", "uint256"], [IDs[2], n, k, file_size, ueb, await newfangDID.functions.nonce(hash(accounts[1]))]);
+  it('Remove DID Signed ', async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256"], [IDs[2], await newfangDID.functions.nonce((accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let tx = await newfangDID.functions.fileUpdateSigned(IDs[2], n, k, file_size, ueb, hash(accounts[1]), sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.deleteFileSigned(IDs[2], accounts[1], sig.v, sig.r, sig.s);
+    updateGas("delete", parseInt(gas));
+    let before = await newfangDID.version(IDs[2]);
+    let tx = await newfangDID.functions.deleteFileSigned(IDs[2], accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
-
-    let file = (await newfangDID.functions.files(IDs[2]));
-    assert.ok(parseInt(file.n) === n && parseInt(file.k) === k && parseInt(file.file_size) === file_size && file.ueb === ueb, "File attributes don't match");
+    let after = await newfangDID.version(IDs[2]);
+    assert.ok(after - before === 1, "Version not decreased");
+    assert.ok(await newfangDID.owners(IDs[2]) === "0x0000000000000000000000000000000000000000", "Owner not removed");
+    assert.ok(await newfangDID.isDeleted(IDs[2]), "Deleted status not changed")
   });
 
 });
