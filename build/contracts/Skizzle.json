@@ -28668,6 +28668,12 @@
     "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
   },
   "networks": {
+    "137": {
+      "links": {},
+      "events": {},
+      "address": "0x13e3a96c74e216d58EEBb4C2E03C1aeD94D52D8D",
+      "updated_at": 1598956480840
+    },
     "80001": {
       "links": {},
       "events": {},
@@ -28676,7 +28682,7 @@
     }
   },
   "schemaVersion": "3.1.0",
-  "updatedAt": "2020-08-26T07:34:00.948Z",
+  "updatedAt": "2020-09-01T10:34:07.219Z",
   "devdoc": {
     "methods": {
       "revokeSigned(bytes32,address,bytes32,address,uint8,bytes32,bytes32)": {
