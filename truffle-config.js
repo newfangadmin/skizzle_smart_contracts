@@ -21,7 +21,7 @@ module.exports = {
 
     // Useful for private networks
     private: {
-      provider: () => new HDWalletProvider(config.private_key, `https://rpc-mumbai.matic.today`),
+      provider: () => new HDWalletProvider(config.private_key, config.matic),
       production: true,    // Treats this network as if it was a public net. (default: false)
       network_id: "*",
       skipDryRun: true

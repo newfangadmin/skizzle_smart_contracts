@@ -99,3 +99,6 @@ modules.xml
 # End of https://www.gitignore.io/api/jetbrains+all
 
 .zos.session
+zos*
+config.json
+
