@@ -152,6 +152,7 @@ Coming Soon!
 
 ## Deploying proxy smart contract
 ```shell script
+cp config.test.json config.json
 rm .zos*
 rm zos*
 zos init # creates zos.json
