@@ -1,6 +1,6 @@
 const assert = require('assert');
 const ethers = require('ethers');
-const config = require('../config.json');
+const config = require('../config.test.json');
 
 const ganache = require('ganache-cli');
 const fs = require('fs');
