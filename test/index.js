@@ -80,13 +80,14 @@ describe('Contract initialization, DID creation', async () => {
 describe('Signed Functions', async () => {
   it('Create DID Signed', async () => {
     let n = 6, k = 4, file_size = 1200, ueb = "UEB";
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "uint256"], [IDs[2], n, k, file_size, await newfangDID.functions.nonce((accounts[1]))]);
+    let nonce = new Date().getTime();
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "uint256"], [IDs[2], n, k, file_size, nonce]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let gas = await newfangDID.estimate.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s, ethers.utils.toUtf8Bytes(ueb));
+    let gas = await newfangDID.estimate.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), nonce, sig.v, sig.r, sig.s, ethers.utils.toUtf8Bytes(ueb));
     updateGas("create did", parseInt(gas));
-    let tx = await newfangDID.functions.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), sig.v, sig.r, sig.s, ethers.utils.toUtf8Bytes(ueb));
+    let tx = await newfangDID.functions.createDIDSigned(IDs[2], n, k, file_size, (accounts[1]), nonce, sig.v, sig.r, sig.s, ethers.utils.toUtf8Bytes(ueb));
     await tx.wait();
     assert.ok(await newfangDID.owners(IDs[2]) === (accounts[1]), "owner do not match");
     let file = await newfangDID.files(IDs[2]);
@@ -96,43 +97,44 @@ describe('Signed Functions', async () => {
 
 
   it('Share DID Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32[]", "address[]", "bytes32[]", "uint256[]", "uint256"],
+    let nonce = new Date().getTime();
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32[]", "address", "bytes32[]", "uint256[]", "uint256"],
       [
         [IDs[2]],
-        [accounts[2]],
+        accounts[2],
         [AccessTypes.read],
         [120],
-        await newfangDID.functions.nonce((accounts[1]))
+        nonce
       ]);
-    // console.log(await newfangDID.owners(IDs[2]) === (accounts[2]));
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
     let gas = await newfangDID.estimate.shareSigned(
       [IDs[2]],
-      [(accounts[2])],
+      accounts[2],
       [AccessTypes.read],
       [120],
-      accounts[1], sig.v, sig.r, sig.s);
+      accounts[1], nonce, sig.v, sig.r, sig.s);
     updateGas("share", parseInt(gas));
     let tx = await newfangDID.functions.shareSigned(
       [IDs[2]],
-      [(accounts[2])],
+      accounts[2],
       [AccessTypes.read],
       [120],
-      accounts[1], sig.v, sig.r, sig.s);
+      accounts[1], nonce, sig.v, sig.r, sig.s);
     await tx.wait();
     let ACK = await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[2]));
     assert.ok(parseInt(ACK.validity) !== 0, "Validity can not be 0")
   });
 
   it('Download Signed', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[2], AccessTypes.read, await newfangDID.functions.nonce((accounts[2]))]);
+    let nonce = new Date().getTime();
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "bytes32", "uint256"], [IDs[2], AccessTypes.read, nonce]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[2]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    updateGas("download", parseInt(await newfangDID.estimate.downloadSigned(IDs[2], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s)));
-    let tx = await newfangDID.functions.downloadSigned(IDs[2], AccessTypes.read, (accounts[2]), sig.v, sig.r, sig.s);
+    updateGas("download", parseInt(await newfangDID.estimate.downloadSigned(IDs[2], AccessTypes.read, (accounts[2]), nonce, sig.v, sig.r, sig.s)));
+    let tx = await newfangDID.functions.downloadSigned(IDs[2], AccessTypes.read, (accounts[2]), nonce, sig.v, sig.r, sig.s);
     let data = await tx.wait();
     // console.log(data.events[0]);
     let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[2])));
@@ -149,27 +151,29 @@ describe('Signed Functions', async () => {
   // });
 
   it('Revoke Signed with zero validity', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "uint256"], [IDs[2], (accounts[2]), AccessTypes["read"], await newfangDID.functions.nonce((accounts[1]))]);
+    let nonce = new Date().getTime();
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "address", "bytes32", "uint256"], [IDs[2], (accounts[2]), AccessTypes["read"], nonce]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let gas = await newfangDID.estimate.revokeSigned(IDs[2], (accounts[2]), AccessTypes["read"], (accounts[1]), sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.revokeSigned(IDs[2], (accounts[2]), AccessTypes["read"], (accounts[1]), nonce, sig.v, sig.r, sig.s);
     updateGas("revoke", parseInt(gas));
-    let tx = await newfangDID.functions.revokeSigned(IDs[2], (accounts[2]), AccessTypes["read"], (accounts[1]), sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.revokeSigned(IDs[2], (accounts[2]), AccessTypes["read"], (accounts[1]), nonce, sig.v, sig.r, sig.s);
     await tx.wait();
     let validity = (await newfangDID.functions.accessSpecifier(IDs[2], AccessTypes["read"], (accounts[2])));
     assert.ok(parseInt(validity) === 0, "Validity not 0")
   });
 
   it('Remove DID Signed ', async () => {
-    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256"], [IDs[2], await newfangDID.functions.nonce((accounts[1]))]);
+    let nonce = new Date().getTime();
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256"], [IDs[2], nonce]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let gas = await newfangDID.estimate.deleteFileSigned(IDs[2], accounts[1], sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.deleteFileSigned(IDs[2], accounts[1], nonce, sig.v, sig.r, sig.s);
     updateGas("delete", parseInt(gas));
     let before = await newfangDID.version(IDs[2]);
-    let tx = await newfangDID.functions.deleteFileSigned(IDs[2], accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.functions.deleteFileSigned(IDs[2], accounts[1], nonce, sig.v, sig.r, sig.s);
     await tx.wait();
     let after = await newfangDID.version(IDs[2]);
     assert.ok(after - before === 1, "Version not decreased");

@@ -14,7 +14,7 @@ contract Skizzle is Initializable {
     mapping(bytes32 => mapping(bytes32 => mapping(address => ACK))) public accessSpecifier;
     // It is used to get all users of a particular type with particular access
     mapping(bytes32 => mapping(bytes32 => address[])) public userAccess;
-    mapping(address => uint) public nonce;
+    mapping(address => mapping(uint256 => bool)) public nonce;
     mapping(bytes32 => File) public files;
     mapping(bytes32 => bool) public isDeleted;
     mapping(bytes32 => uint256) public version;
@@ -89,19 +89,20 @@ contract Skizzle is Initializable {
     }
 
 
-    function createDIDSigned(bytes32 _file, uint256 n, uint256 k, uint256 _file_size, address signer, uint8 v, bytes32 r, bytes32 s, bytes memory _ueb) public onlyNode {
+    function createDIDSigned(bytes32 _file, uint256 n, uint256 k, uint256 _file_size, address signer, uint256 _nonce, uint8 v, bytes32 r, bytes32 s, bytes memory _ueb) public onlyNode {
+        require(!nonce[signer][_nonce], "None already used");
         require(owners[_file] == address(0), "Owner already exist for this file");
-        require(n <= total_nodes , "N should be less then number of total nodes");
+        require(n <= total_nodes, "N should be less then number of total nodes");
         require(n > k, "n>k");
         require(k > 1, "k should not be 0");
         require(_file_size != 0, "Should not be 0");
-        bytes32 payloadHash = keccak256(abi.encode(_file, n, k, _file_size, nonce[signer]));
+        bytes32 payloadHash = keccak256(abi.encode(_file, n, k, _file_size, _nonce));
         address _identity = getSigner(payloadHash, signer, v, r, s);
         owners[_file] = _identity;
         files[_file] = File(n, k, _file_size, msg.sender, _ueb);
         isDeleted[_file] = false;
         emit NewFileUpdate(owners[_file], _file, n, k, _file_size, _ueb);
-        nonce[_identity]++;
+        nonce[signer][_nonce] = true;
     }
 
     event deleteFileEvent(
@@ -110,14 +111,15 @@ contract Skizzle is Initializable {
     );
 
 
-    function deleteFileSigned(bytes32 _file, address signer, uint8 v, bytes32 r, bytes32 s) public onlyNode {
-        bytes32 payloadHash = keccak256(abi.encode(_file, nonce[signer]));
+    function deleteFileSigned(bytes32 _file, address signer, uint256 _nonce, uint8 v, bytes32 r, bytes32 s) public onlyNode {
+        require(!nonce[signer][_nonce], "None already used");
+        bytes32 payloadHash = keccak256(abi.encode(_file, _nonce));
         address _identity = getSigner(payloadHash, signer, v, r, s);
         require(owners[_file] == _identity, "Owner does not match");
         isDeleted[_file] = true;
         version[_file]++;
         delete owners[_file];
-        nonce[_identity]++;
+        nonce[signer][_nonce] = true;
         emit deleteFileEvent(_identity, _file);
     }
 
@@ -150,19 +152,18 @@ contract Skizzle is Initializable {
      contract along with its validity
     * @return bool
     */
-    function shareSigned(bytes32[] memory _files, address[] memory _user, bytes32[] memory _access_type, uint256[] memory _validity, address signer, uint8 v, bytes32 r, bytes32 s) onlyNode public {
-        bytes32 payloadHash = keccak256(abi.encode(_files, _user, _access_type, _validity, nonce[signer]));
+    function shareSigned(bytes32[] memory _files, address _user, bytes32[] memory _access_type, uint256[] memory _validity, address signer, uint256 _nonce, uint8 v, bytes32 r, bytes32 s) onlyNode public {
+        require(!nonce[signer][_nonce], "None already used");
+        bytes32 payloadHash = keccak256(abi.encode(_files, _user, _access_type, _validity, _nonce));
         address _identity = getSigner(payloadHash, signer, v, r, s);
         for (uint j = 0; j < _files.length; j++) {
-            for (uint i = 0; i < _user.length; i++) {
-                require(_identity == owners[_files[j]]);
-                require(_validity[i] != 0, "Validity must be non zero");
-                accessSpecifier[_files[j]][_access_type[i]][_user[i]] = ACK(now.add(_validity[i]), version[_files[j]]);
-                userAccess[_files[j]][_access_type[i]].push(_user[i]);
-                emit NewShare(_identity, _files[j], _user[i], _access_type[i], _validity[i], nonce[_identity]);
-            }
+            require(_identity == owners[_files[j]], "Owner does not match");
+            require(_validity[j] != 0, "Validity must be non zero");
+            accessSpecifier[_files[j]][_access_type[j]][_user] = ACK(now.add(_validity[j]), version[_files[j]]);
+            userAccess[_files[j]][_access_type[j]].push(_user);
+            emit NewShare(_identity, _files[j], _user, _access_type[j], _validity[j], _nonce);
         }
-        nonce[_identity]++;
+        nonce[signer][_nonce] = true;
     }
 
     event NewFileUpdate(
@@ -182,8 +183,9 @@ contract Skizzle is Initializable {
     );
 
 
-    function downloadSigned(bytes32 _file, bytes32 _access_type, address signer, uint8 v, bytes32 r, bytes32 s) onlyNode public returns (uint256) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _access_type, nonce[signer]));
+    function downloadSigned(bytes32 _file, bytes32 _access_type, address signer, uint256 _nonce, uint8 v, bytes32 r, bytes32 s) onlyNode public returns (uint256) {
+        require(!nonce[signer][_nonce], "None already used");
+        bytes32 payloadHash = keccak256(abi.encode(_file, _access_type, _nonce));
         address _identity = getSigner(payloadHash, signer, v, r, s);
         ACK memory ack = accessSpecifier[_file][_access_type][_identity];
         uint256 validity = ack.validity;
@@ -193,7 +195,7 @@ contract Skizzle is Initializable {
             require(ack.version == version[_file], "Version of file doesn't match");
             require(validity != uint256(0), "Validity is 0");
         }
-        nonce[_identity]++;
+        nonce[signer][_nonce] = true;
         emit NewDownload(_identity, _file, validity, _access_type);
         return validity;
     }
@@ -220,33 +222,27 @@ contract Skizzle is Initializable {
     file again with desired access type and you may remove the previous access type
     * @return bool
     */
-    function revokeSigned(bytes32 _file, address _user, bytes32 _access_type, address signer, uint8 v, bytes32 r, bytes32 s) onlyNode public {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, nonce[signer]));
+    function revokeSigned(bytes32 _file, address _user, bytes32 _access_type, address signer, uint256 _nonce, uint8 v, bytes32 r, bytes32 s) onlyNode public {
+        require(!nonce[signer][_nonce], "None already used");
+        bytes32 payloadHash = keccak256(abi.encode(_file, _user, _access_type, _nonce));
         address _identity = getSigner(payloadHash, signer, v, r, s);
+        require(_identity == owners[_file], "Owner does not match");
         delete accessSpecifier[_file][_access_type][_user];
         uint index = IndexOf(userAccess[_file][_access_type], _user);
         delete userAccess[_file][_access_type][index];
-        nonce[_identity]++;
+        nonce[signer][_nonce] = true;
         emit NewUpdateACK(_identity, _file, _user, _access_type);
     }
 
 
-
-    /**
-    * @dev Change file Owner
-    * @return bool
-    */
-    function changeFileOwner(address _identity, bytes32 _file, address _new_owner) internal onlyFileOwner(_file, _identity) returns (bool){
+    function changeOwnerSigned(bytes32 _file, address _new_owner, address signer, uint256 _nonce, uint8 v, bytes32 r, bytes32 s) onlyNode public {
+        require(!nonce[signer][_nonce], "None already used");
         require(_new_owner != address(0), "Invalid address");
-        owners[_file] = _new_owner;
-        nonce[_identity]++;
-        return true;
-    }
-
-    function changeOwnerSigned(bytes32 _file, address _new_owner, address signer, uint8 v, bytes32 r, bytes32 s) onlyNode public returns (bool) {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _new_owner, nonce[signer]));
+        bytes32 payloadHash = keccak256(abi.encode(_file, _new_owner, _nonce));
         address actualSigner = getSigner(payloadHash, signer, v, r, s);
-        return changeFileOwner(actualSigner, _file, _new_owner);
+        require(actualSigner == owners[_file], "Owner does not match");
+        owners[_file] = _new_owner;
+        nonce[signer][_nonce] = true;
     }
 
 }
