@@ -1,5 +1,6 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const config = require('./config');
+const config_test = require('./config.test');
 
 module.exports = {
   contracts_build_directory: "./build/contracts",
@@ -22,6 +23,13 @@ module.exports = {
     // Useful for private networks
     private: {
       provider: () => new HDWalletProvider(config.private_key, config.matic),
+      production: true,    // Treats this network as if it was a public net. (default: false)
+      network_id: "*",
+      skipDryRun: true
+    },
+
+    testnet: {
+      provider: () => new HDWalletProvider(config_test.private_key, config_test.matic),
       production: true,    // Treats this network as if it was a public net. (default: false)
       network_id: "*",
       skipDryRun: true
