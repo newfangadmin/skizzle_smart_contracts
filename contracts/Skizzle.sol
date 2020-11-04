@@ -71,6 +71,7 @@ contract Skizzle is Initializable {
     }
 
     event create(address identity, bytes32 file, bytes32 doc);
+    event read(address identity, bytes32 file);
     event update(address identity, bytes32 file, bytes32 doc);
     event deleteDID(address identity, bytes32 file);
 
@@ -92,6 +93,24 @@ contract Skizzle is Initializable {
         docs[_file] = File(signer,_ueb, _doc);
         nonce[signer]++;
         emit create(signer, _file, _doc);
+    }
+
+    // This function does not checks wether the signer has permission to read/download the file or not. 
+    // Permission should be checked offline only.
+    // User will sign a transaction and send it to SNA, SNA will verify wether user is having permission or not. 
+    // If user has permission then this function will be called.
+    // This functions verifies the email and emit a read event on the file. 
+    function readSigned(
+        bytes32 _file,
+        address signer,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public {
+        bytes32 payloadHash = keccak256(abi.encode(_file, nonce[signer]));
+        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not. 
+        nonce[signer]++;
+        emit read(signer, _file);
     }
 
     // This function is used for share and revoke. The DID Document is updated and the merkle root is calculated again and update here.  

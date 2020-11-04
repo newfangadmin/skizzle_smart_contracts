@@ -96,6 +96,18 @@ describe("CRUD", async ()=>{
 
   });
 
+  it("Read", async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256"], [IDs[0], await newfangDID.functions.nonce(accounts[1])]);
+    let payloadHash = ethers.utils.keccak256(payload);
+    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+    let sig = ethers.utils.splitSignature(signature);
+
+    let gas = await newfangDID.estimate.readSigned(IDs[0], accounts[1], sig.v, sig.r, sig.s)
+    updateGas("read", parseInt(gas));
+    let tx = await newfangDID.readSigned(IDs[0], accounts[1], sig.v, sig.r, sig.s)
+    await tx.wait();
+
+  });
   it("Update", async () => {
     let doc = ethers.utils.formatBytes32String("hash of document");
 
