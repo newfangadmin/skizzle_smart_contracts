@@ -1,4 +1,4 @@
-const DID = artifacts.require("NewfangDIDRegistry");
+const DID = artifacts.require("Skizzle");
 
 module.exports = function (deployer) {
     deployer.deploy(DID);

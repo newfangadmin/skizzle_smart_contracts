@@ -108,6 +108,21 @@ describe("CRUD", async ()=>{
     updateGas("update", parseInt(gas));
     let tx = await newfangDID.updateSigned(IDs[0], doc, accounts[1], sig.v, sig.r, sig.s)
     await tx.wait();
+    assert.equal((await newfangDID.docs(IDs[0])).doc, doc);
+
+  });
+
+  it("Delete", async () => {
+    let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256"], [IDs[0], await newfangDID.functions.nonce(accounts[1])]);
+    let payloadHash = ethers.utils.keccak256(payload);
+    let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
+    let sig = ethers.utils.splitSignature(signature);
+
+    let gas = await newfangDID.estimate.deleteSigned(IDs[0], accounts[1], sig.v, sig.r, sig.s)
+    updateGas("delete", parseInt(gas));
+    let tx = await newfangDID.deleteSigned(IDs[0], accounts[1], sig.v, sig.r, sig.s)
+    await tx.wait();
+    assert.equal((await newfangDID.docs(IDs[0])).doc, "0x0000000000000000000000000000000000000000000000000000000000000000");
 
   });
 

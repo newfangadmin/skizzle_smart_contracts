@@ -21,10 +21,10 @@ module.exports = {
 
     // Useful for private networks
     private: {
-      provider: () => new HDWalletProvider(config.private_key, `https://alpha.ethereum.matic.network`),
+      provider: () => new HDWalletProvider(config.private_key, `https://rpc-mumbai.maticvigil.com/v1/8d287d9b9fc81a902d022ba48a016f8a616796c3`),
       production: true,    // Treats this network as if it was a public net. (default: false)
       network_id: "*",
-      gasPrice: '0x0',
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true
     }
   },

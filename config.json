@@ -1,7 +1,7 @@
 {
   "private_key": "24C4FE6063E62710EAD956611B71825B778B041B18ED53118CE5DA5F02E494BA",
   "network": "ropsten",
-  "matic": "http://13.127.220.91:8545",
+  "matic": "http://maticmumbai.skizzle.email/",
   "matic_mainet": "https://alpha.ethereum.matic.network",
   "EthereumDIDRegistry": "0xb9b7BEAA9276F8C79996a4B70C3BB4E01C886e6f",
   "NewfangDIDRegistry": "0x3bEb087e33eC0B830325991A32E3F8bb16A51317"
