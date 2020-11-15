@@ -16,6 +16,9 @@ contract Skizzle is Initializable {
         address owner;
         bytes32 ueb;
         bytes32 doc;
+        uint256 n;
+        uint256 k;
+        uint256 size;
     }
 
     // Modifier to check whether the functions are called by file owners.
@@ -70,7 +73,7 @@ contract Skizzle is Initializable {
         return actualSigner;
     }
 
-    event create(address identity, bytes32 file, bytes32 doc);
+    event create(address identity, bytes32 file, bytes32 doc, uint256 n, uint256 k, uint256 size);
     event read(address identity, bytes32 file);
     event update(address identity, bytes32 file, bytes32 doc);
     event deleteDID(address identity, bytes32 file);
@@ -79,6 +82,9 @@ contract Skizzle is Initializable {
         bytes32 _file,
         bytes32 _doc,
         bytes32 _ueb,
+        uint256 _n,
+        uint256 _k,
+        uint256 _size,
         address signer,
         uint8 v,
         bytes32 r,
@@ -88,11 +94,11 @@ contract Skizzle is Initializable {
             docs[_file].owner == address(0),
             "Owner already exist for this file"
         );
-        bytes32 payloadHash = keccak256(abi.encode(_file, _doc, nonce[signer]));
+        bytes32 payloadHash = keccak256(abi.encode(_file, _doc, _n, _k, _size,nonce[signer]));
         getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not. 
-        docs[_file] = File(signer,_ueb, _doc);
+        docs[_file] = File(signer,_ueb, _doc, _n, _k, _size);
         nonce[signer]++;
-        emit create(signer, _file, _doc);
+        emit create(signer, _file, _doc, _n, _k, _size);
     }
 
     // This function does not checks wether the signer has permission to read/download the file or not. 

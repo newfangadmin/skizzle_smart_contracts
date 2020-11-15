@@ -4,8 +4,8 @@
     "Skizzle": "Skizzle"
   },
   "dependencies": {},
-  "name": "#",
-  "version": "creates",
+  "name": "skizzle_smart_contracts",
+  "version": "1.0.0",
   "compiler": {
     "manager": "truffle",
     "compilerSettings": {
