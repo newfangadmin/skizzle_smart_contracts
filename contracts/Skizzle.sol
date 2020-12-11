@@ -14,7 +14,7 @@ contract Skizzle is Initializable {
 
     struct File {
         address owner;
-        bytes32 ueb;
+        bytes ueb;
         bytes32 doc;
         uint256 n;
         uint256 k;
@@ -33,7 +33,7 @@ contract Skizzle is Initializable {
         _;
     }
 
-    // Modifier to check whether functions are called by SNA nodes. 
+    // Modifier to check whether functions are called by SNA nodes.
     modifier onlyNode() {
         require(isNode[msg.sender], "Should be called by owner");
         _;
@@ -41,8 +41,8 @@ contract Skizzle is Initializable {
 
     // Initialize is called when contract is deployed.
     // It does 2 things:
-    // 1. Set's the contract owner 
-    // 2. It adds default nodes to the contract. 
+    // 1. Set's the contract owner
+    // 2. It adds default nodes to the contract.
     function initialize(address[] memory _nodes) public initializer {
         owner = msg.sender;
         for (uint256 i = 0; i < _nodes.length; i++) {
@@ -81,10 +81,10 @@ contract Skizzle is Initializable {
     function createSigned(
         bytes32 _file,
         bytes32 _doc,
-        bytes32 _ueb,
         uint256 _n,
         uint256 _k,
         uint256 _size,
+        bytes memory _ueb,
         address signer,
         uint8 v,
         bytes32 r,
@@ -95,17 +95,17 @@ contract Skizzle is Initializable {
             "Owner already exist for this file"
         );
         bytes32 payloadHash = keccak256(abi.encode(_file, _doc, _n, _k, _size,nonce[signer]));
-        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not. 
+        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not.
         docs[_file] = File(signer,_ueb, _doc, _n, _k, _size);
         nonce[signer]++;
         emit create(signer, _file, _doc, _n, _k, _size);
     }
 
-    // This function does not checks wether the signer has permission to read/download the file or not. 
+    // This function does not checks wether the signer has permission to read/download the file or not.
     // Permission should be checked offline only.
-    // User will sign a transaction and send it to SNA, SNA will verify wether user is having permission or not. 
+    // User will sign a transaction and send it to SNA, SNA will verify wether user is having permission or not.
     // If user has permission then this function will be called.
-    // This functions verifies the email and emit a read event on the file. 
+    // This functions verifies the email and emit a read event on the file.
     function readSigned(
         bytes32 _file,
         address signer,
@@ -114,15 +114,15 @@ contract Skizzle is Initializable {
         bytes32 s
     ) public {
         bytes32 payloadHash = keccak256(abi.encode(_file, nonce[signer]));
-        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not. 
+        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not.
         nonce[signer]++;
         emit read(signer, _file);
     }
 
-    // This function is used for share and revoke. The DID Document is updated and the merkle root is calculated again and update here.  
-    // onlyFileOwner modifier checks whether user has the permission to call the function or not. 
-    // It does not checks for signature. 
-    // Signature is checked in getSigner function. 
+    // This function is used for share and revoke. The DID Document is updated and the merkle root is calculated again and update here.
+    // onlyFileOwner modifier checks whether user has the permission to call the function or not.
+    // It does not checks for signature.
+    // Signature is checked in getSigner function.
     function updateSigned(
         bytes32 _file,
         bytes32 _doc,
@@ -130,9 +130,9 @@ contract Skizzle is Initializable {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) onlyFileOwner(_file, signer) public { 
+    ) onlyFileOwner(_file, signer) public {
         bytes32 payloadHash = keccak256(abi.encode(_file, _doc, nonce[signer]));
-        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not. 
+        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not.
         docs[_file].doc = _doc;
         nonce[signer]++;
         emit update(signer, _file, _doc);
@@ -146,7 +146,7 @@ contract Skizzle is Initializable {
         bytes32 s
     ) onlyFileOwner(_file, signer) public {
         bytes32 payloadHash = keccak256(abi.encode(_file, nonce[signer]));
-        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not. 
+        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not.
         delete docs[_file];
         nonce[signer]++;
         emit deleteDID(signer, _file);
