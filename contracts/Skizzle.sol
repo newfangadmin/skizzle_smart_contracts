@@ -21,9 +21,17 @@ contract Skizzle is Initializable {
         uint256 size;
     }
 
-    // Modifier to check whether the functions are called by file owners.
+    // Modifier to check whether the functions are called by file owner.
     modifier onlyFileOwner(bytes32 _file, address _identity) {
         require(_identity == docs[_file].owner);
+        _;
+    }
+
+    // Modifier to check whether the functions are called by file owner(Multiple File)
+    modifier onlyFilesOwner(bytes32[] memory _files, address _identity) {
+        for(uint i=0; i<=_files.length;i++){
+            require(_identity == docs[_files[i]].owner);
+        }
         _;
     }
 
@@ -94,9 +102,10 @@ contract Skizzle is Initializable {
             docs[_file].owner == address(0),
             "Owner already exist for this file"
         );
-        bytes32 payloadHash = keccak256(abi.encode(_file, _doc, _n, _k, _size,nonce[signer]));
-        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not.
-        docs[_file] = File(signer,_ueb, _doc, _n, _k, _size);
+        bytes32 payloadHash = keccak256(abi.encode(_file, _doc, _n, _k, _size, nonce[signer]));
+        getSigner(payloadHash, signer, v, r, s);
+        // Just to check signature is valid or not.
+        docs[_file] = File(signer, _ueb, _doc, _n, _k, _size);
         nonce[signer]++;
         emit create(signer, _file, _doc, _n, _k, _size);
     }
@@ -114,7 +123,8 @@ contract Skizzle is Initializable {
         bytes32 s
     ) public {
         bytes32 payloadHash = keccak256(abi.encode(_file, nonce[signer]));
-        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not.
+        getSigner(payloadHash, signer, v, r, s);
+        // Just to check signature is valid or not.
         nonce[signer]++;
         emit read(signer, _file);
     }
@@ -124,18 +134,24 @@ contract Skizzle is Initializable {
     // It does not checks for signature.
     // Signature is checked in getSigner function.
     function updateSigned(
-        bytes32 _file,
-        bytes32 _doc,
+        bytes32[] memory _files,
+        bytes32[] memory _docs,
         address signer,
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) onlyFileOwner(_file, signer) public {
-        bytes32 payloadHash = keccak256(abi.encode(_file, _doc, nonce[signer]));
-        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not.
-        docs[_file].doc = _doc;
+    ) public onlyFilesOwner(_files, signer){
+//    ) public {
+        require(_files.length == _docs.length, "Length does not match");
+//        // Just to check signature is valid or not.
+        bytes32 payloadHash = keccak256(abi.encode(_files, _docs, nonce[signer]));
+        getSigner(payloadHash, signer, v, r, s);
+        for (uint i = 0; i <= _files.length; i++) {
+            // Check weather signer is the owner of the file.
+            docs[_files[i]].doc = _docs[i];
+            emit update(signer, _files[i], _docs[i]);
+        }
         nonce[signer]++;
-        emit update(signer, _file, _doc);
     }
 
     function deleteSigned(
@@ -146,7 +162,8 @@ contract Skizzle is Initializable {
         bytes32 s
     ) onlyFileOwner(_file, signer) public {
         bytes32 payloadHash = keccak256(abi.encode(_file, nonce[signer]));
-        getSigner(payloadHash, signer, v, r, s); // Just to check signature is valid or not.
+        getSigner(payloadHash, signer, v, r, s);
+        // Just to check signature is valid or not.
         delete docs[_file];
         nonce[signer]++;
         emit deleteDID(signer, _file);

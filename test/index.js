@@ -124,19 +124,18 @@ describe('CRUD', async () => {
     await tx.wait();
   });
   it('Update', async () => {
-    let doc = ethers.utils.formatBytes32String('hash of document');
-
+    let doc = [ethers.utils.formatBytes32String('hash of document')];
     let payload = ethers.utils.defaultAbiCoder.encode(
-      ['bytes32', 'bytes32', 'uint256'],
-      [IDs[0], doc, await newfangDID.functions.nonce(accounts[1])]
+      ['bytes32[]', 'bytes32[]', 'uint256'],
+      [[IDs[0]], doc, await newfangDID.functions.nonce(accounts[1])]
     );
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-
-    let gas = await newfangDID.estimate.updateSigned(IDs[0], doc, accounts[1], sig.v, sig.r, sig.s);
-    updateGas('update', parseInt(gas));
-    let tx = await newfangDID.updateSigned(IDs[0], doc, accounts[1], sig.v, sig.r, sig.s);
+    // let gas = await newfangDID.estimate.updateSigned([IDs[0]], doc, accounts[1], sig.v, sig.r, sig.s);
+    // console.log("asdfasdf",gas);
+    // updateGas('update', parseInt(gas));
+    let tx = await newfangDID.updateSigned([IDs[0]], doc, accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
     assert.equal((await newfangDID.docs(IDs[0])).doc, doc);
   });
