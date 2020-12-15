@@ -132,9 +132,8 @@ describe('CRUD', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    // let gas = await newfangDID.estimate.updateSigned([IDs[0]], doc, accounts[1], sig.v, sig.r, sig.s);
-    // console.log("asdfasdf",gas);
-    // updateGas('update', parseInt(gas));
+    let gas = await newfangDID.estimate.updateSigned([IDs[0]], doc, accounts[1], sig.v, sig.r, sig.s);
+    updateGas('update', parseInt(gas));
     let tx = await newfangDID.updateSigned([IDs[0]], doc, accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
     assert.equal((await newfangDID.docs(IDs[0])).doc, doc);

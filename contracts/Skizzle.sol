@@ -29,7 +29,7 @@ contract Skizzle is Initializable {
 
     // Modifier to check whether the functions are called by file owner(Multiple File)
     modifier onlyFilesOwner(bytes32[] memory _files, address _identity) {
-        for(uint i=0; i<=_files.length;i++){
+        for(uint i=0; i<_files.length;i++){
             require(_identity == docs[_files[i]].owner);
         }
         _;
@@ -146,7 +146,7 @@ contract Skizzle is Initializable {
 //        // Just to check signature is valid or not.
         bytes32 payloadHash = keccak256(abi.encode(_files, _docs, nonce[signer]));
         getSigner(payloadHash, signer, v, r, s);
-        for (uint i = 0; i <= _files.length; i++) {
+        for (uint i = 0; i < _files.length; i++) {
             // Check weather signer is the owner of the file.
             docs[_files[i]].doc = _docs[i];
             emit update(signer, _files[i], _docs[i]);
