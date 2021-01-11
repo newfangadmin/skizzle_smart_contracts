@@ -26,6 +26,10 @@ let AccessTypes = {
   delete: ethers.utils.formatBytes32String("delete")
 };
 
+function bigN(d) {
+  return ethers.utils.parseUnits(String(d), 0);
+}
+
 function updateGas(key, value) {
   gasFees[key] = value;
   fs.writeFileSync('gas.json', JSON.stringify(gasFees));
@@ -79,7 +83,7 @@ describe('Contract initialization, DID creation', async () => {
 
 describe('Signed Functions', async () => {
   it('Create DID Signed', async () => {
-    let n = 6, k = 4, file_size = 1200, ueb = "UEB";
+    let n = bigN(6), k = bigN(4), file_size = bigN(1200), ueb = "UEB";
     let payload = ethers.utils.defaultAbiCoder.encode(["bytes32", "uint256", "uint256", "uint256", "uint256"], [IDs[2], n, k, file_size, await newfangDID.functions.nonce((accounts[1]))]);
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
