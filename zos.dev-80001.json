@@ -1,0 +1,182 @@
+{
+  "contracts": {
+    "Skizzle": {
+      "address": "0xEe0cB2dA491c7aA889C289fa6f9Ad4cca34047E1",
+      "constructorCode": "608060405234801561001057600080fd5b50611c45806100206000396000f3fe",
+      "bodyBytecodeHash": "b61e4d384533e4b3469cf19b9ba20c31eb90a94e47f27eb0a782107822d603ac",
+      "localBytecodeHash": "4c5a332904620b9414108f133a762f320b3578c4b00f7fd5ef48de98902f6dd4",
+      "deployedBytecodeHash": "4c5a332904620b9414108f133a762f320b3578c4b00f7fd5ef48de98902f6dd4",
+      "types": {
+        "t_bool": {
+          "id": "t_bool",
+          "kind": "elementary",
+          "label": "bool"
+        },
+        "t_uint256": {
+          "id": "t_uint256",
+          "kind": "elementary",
+          "label": "uint256"
+        },
+        "t_array:50<t_uint256>": {
+          "id": "t_array:50<t_uint256>",
+          "valueType": "t_uint256",
+          "length": "50",
+          "kind": "array",
+          "label": "uint256[50]"
+        },
+        "t_address": {
+          "id": "t_address",
+          "kind": "elementary",
+          "label": "address"
+        },
+        "t_struct<Skizzle.File>": {
+          "id": "t_struct<Skizzle.File>",
+          "kind": "struct",
+          "label": "Skizzle.File",
+          "members": [
+            {
+              "label": "owner",
+              "astId": 319,
+              "type": "t_address",
+              "src": "418:13:3"
+            },
+            {
+              "label": "ueb",
+              "astId": 321,
+              "type": "t_bytes",
+              "src": "441:9:3"
+            },
+            {
+              "label": "doc",
+              "astId": 323,
+              "type": "t_bytes32",
+              "src": "460:11:3"
+            },
+            {
+              "label": "n",
+              "astId": 325,
+              "type": "t_uint256",
+              "src": "481:9:3"
+            },
+            {
+              "label": "k",
+              "astId": 327,
+              "type": "t_uint256",
+              "src": "500:9:3"
+            },
+            {
+              "label": "size",
+              "astId": 329,
+              "type": "t_uint256",
+              "src": "519:12:3"
+            }
+          ]
+        },
+        "t_bytes": {
+          "id": "t_bytes",
+          "kind": "elementary",
+          "label": "bytes"
+        },
+        "t_bytes32": {
+          "id": "t_bytes32",
+          "kind": "elementary",
+          "label": "bytes32"
+        },
+        "t_mapping<t_struct<Skizzle.File>>": {
+          "id": "t_mapping<t_struct<Skizzle.File>>",
+          "valueType": "t_struct<Skizzle.File>",
+          "label": "mapping(key => Skizzle.File)",
+          "kind": "mapping"
+        },
+        "t_mapping<t_bool>": {
+          "id": "t_mapping<t_bool>",
+          "valueType": "t_bool",
+          "label": "mapping(key => bool)",
+          "kind": "mapping"
+        }
+      },
+      "storage": [
+        {
+          "contract": "Initializable",
+          "path": "contracts/Initializable.sol",
+          "label": "initialized",
+          "astId": 3,
+          "type": "t_bool",
+          "src": "756:24:0"
+        },
+        {
+          "contract": "Initializable",
+          "path": "contracts/Initializable.sol",
+          "label": "initializing",
+          "astId": 5,
+          "type": "t_bool",
+          "src": "883:25:0"
+        },
+        {
+          "contract": "Initializable",
+          "path": "contracts/Initializable.sol",
+          "label": "______gap",
+          "astId": 67,
+          "type": "t_array:50<t_uint256>",
+          "src": "2089:29:0"
+        },
+        {
+          "contract": "Skizzle",
+          "path": "contracts/Skizzle.sol",
+          "label": "owner",
+          "astId": 300,
+          "type": "t_address",
+          "src": "119:20:3"
+        },
+        {
+          "contract": "Skizzle",
+          "path": "contracts/Skizzle.sol",
+          "label": "docs",
+          "astId": 307,
+          "type": "t_mapping<t_struct<Skizzle.File>>",
+          "src": "246:36:3"
+        },
+        {
+          "contract": "Skizzle",
+          "path": "contracts/Skizzle.sol",
+          "label": "isNode",
+          "astId": 311,
+          "type": "t_mapping<t_bool>",
+          "src": "288:38:3"
+        },
+        {
+          "contract": "Skizzle",
+          "path": "contracts/Skizzle.sol",
+          "label": "nonce",
+          "astId": 317,
+          "type": "t_mapping<t_bool>",
+          "src": "332:57:3"
+        }
+      ],
+      "warnings": {
+        "hasConstructor": false,
+        "hasSelfDestruct": false,
+        "hasDelegateCall": false,
+        "hasInitialValuesInDeclarations": false,
+        "uninitializedBaseContracts": []
+      }
+    }
+  },
+  "solidityLibs": {},
+  "proxies": {
+    "#/Skizzle": [
+      {
+        "address": "0x1eA980a81534aa89044b0dF53aac6DCc881F83a5",
+        "version": "crates",
+        "implementation": "0xEe0cB2dA491c7aA889C289fa6f9Ad4cca34047E1",
+        "admin": "0x51B5C04e15327f308f37B33c7ab53dBd988F6A78",
+        "kind": "Upgradeable"
+      }
+    ]
+  },
+  "zosversion": "2.2",
+  "version": "crates",
+  "proxyAdmin": {
+    "address": "0x51B5C04e15327f308f37B33c7ab53dBd988F6A78"
+  }
+}
