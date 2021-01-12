@@ -81,10 +81,10 @@ describe('CRUD', async () => {
     let ueb = ethers.utils.toUtf8Bytes('hash of ueb');
     let n = 6,
       k = 4,
-      size = 1200;
+      size = 1200, nonce = new Date().getTime();
     let payload = ethers.utils.defaultAbiCoder.encode(
       ['bytes32', 'bytes32', 'uint256', 'uint256', 'uint256', 'uint256'],
-      [IDs[0], doc, n, k, size, await newfangDID.functions.nonce(accounts[1])]
+      [IDs[0], doc, n, k, size, nonce]
     );
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
@@ -96,13 +96,14 @@ describe('CRUD', async () => {
       k,
       size,
       ueb,
+      nonce,
       accounts[1],
       sig.v,
       sig.r,
       sig.s
     );
     updateGas('create', parseInt(gas));
-    let tx = await newfangDID.createSigned(IDs[0], doc, n, k, size, ueb, accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.createSigned(IDs[0], doc, n, k, size, ueb, nonce,accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
     assert.equal((await newfangDID.docs(IDs[0])).n, n);
     assert.equal((await newfangDID.docs(IDs[0])).k, k);
@@ -110,47 +111,50 @@ describe('CRUD', async () => {
   });
 
   it('Read', async () => {
+    let nonce = new Date().getTime();
     let payload = ethers.utils.defaultAbiCoder.encode(
       ['bytes32', 'uint256'],
-      [IDs[0], await newfangDID.functions.nonce(accounts[1])]
+      [IDs[0], nonce]
     );
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
 
-    let gas = await newfangDID.estimate.readSigned(IDs[0], accounts[1], sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.readSigned(IDs[0], nonce,accounts[1], sig.v, sig.r, sig.s);
     updateGas('read', parseInt(gas));
-    let tx = await newfangDID.readSigned(IDs[0], accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.readSigned(IDs[0], nonce,accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
   });
   it('Update', async () => {
     let doc = [ethers.utils.formatBytes32String('hash of document')];
+    let nonce = new Date().getTime();
     let payload = ethers.utils.defaultAbiCoder.encode(
       ['bytes32[]', 'bytes32[]', 'uint256'],
-      [[IDs[0]], doc, await newfangDID.functions.nonce(accounts[1])]
+      [[IDs[0]], doc, nonce]
     );
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let gas = await newfangDID.estimate.updateSigned([IDs[0]], doc, accounts[1], sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.updateSigned([IDs[0]], doc, nonce,accounts[1], sig.v, sig.r, sig.s);
     updateGas('update', parseInt(gas));
-    let tx = await newfangDID.updateSigned([IDs[0]], doc, accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.updateSigned([IDs[0]], doc, nonce,accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
     assert.equal((await newfangDID.docs(IDs[0])).doc, doc);
   });
 
   it('Delete', async () => {
+    let nonce = new Date().getTime();
     let payload = ethers.utils.defaultAbiCoder.encode(
       ['bytes32', 'uint256'],
-      [IDs[0], await newfangDID.functions.nonce(accounts[1])]
+      [IDs[0], nonce]
     );
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
 
-    let gas = await newfangDID.estimate.deleteSigned(IDs[0], accounts[1], sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.deleteSigned(IDs[0], nonce,accounts[1], sig.v, sig.r, sig.s);
     updateGas('delete', parseInt(gas));
-    let tx = await newfangDID.deleteSigned(IDs[0], accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.deleteSigned(IDs[0], nonce,accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
     assert.equal(
       (await newfangDID.docs(IDs[0])).doc,
