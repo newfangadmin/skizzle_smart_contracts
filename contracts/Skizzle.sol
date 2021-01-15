@@ -27,7 +27,7 @@ contract Skizzle is Initializable {
 
     // Modifier to check whether the functions are called by file owner(Multiple File)
     modifier onlyFilesOwner(bytes32[] memory _files, address _identity) {
-        for(uint i=0; i<_files.length;i++){
+        for (uint i = 0; i < _files.length; i++) {
             require(_identity == docs[_files[i]].owner);
         }
         _;
@@ -88,8 +88,8 @@ contract Skizzle is Initializable {
         bytes32 _file,
         bytes32 _doc,
         uint256 _size,
-        bytes memory _ueb,
         uint256 _nonce,
+        bytes memory _ueb,
         address signer,
         uint8 v,
         bytes32 r,
@@ -104,7 +104,7 @@ contract Skizzle is Initializable {
         getSigner(payloadHash, signer, v, r, s);
         // Just to check signature is valid or not.
         docs[_file] = File(signer, _ueb, _doc, _size);
-        nonce[signer][_nonce]=true;
+        nonce[signer][_nonce] = true;
         emit create(signer, _file, _doc, _size);
     }
 
@@ -141,7 +141,7 @@ contract Skizzle is Initializable {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public onlyFilesOwner(_files, signer){
+    ) public onlyFilesOwner(_files, signer) {
         require(!nonce[signer][_nonce], "None already used");
         require(_files.length == _docs.length, "Length does not match");
         // Just to check signature is valid or not.
@@ -152,7 +152,7 @@ contract Skizzle is Initializable {
             docs[_files[i]].doc = _docs[i];
             emit update(signer, _files[i], _docs[i]);
         }
-        nonce[signer][_nonce]=true;
+        nonce[signer][_nonce] = true;
     }
 
     function deleteSigned(
@@ -168,7 +168,7 @@ contract Skizzle is Initializable {
         getSigner(payloadHash, signer, v, r, s);
         // Just to check signature is valid or not.
         delete docs[_file];
-        nonce[signer][_nonce]=true;
+        nonce[signer][_nonce] = true;
         emit deleteDID(signer, _file);
     }
 }

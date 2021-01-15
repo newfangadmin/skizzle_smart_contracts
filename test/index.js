@@ -91,15 +91,15 @@ describe('CRUD', async () => {
       IDs[0],
       doc,
       size,
-      ueb,
       nonce,
+      ueb,
       accounts[1],
       sig.v,
       sig.r,
       sig.s
     );
     updateGas('create', parseInt(gas));
-    let tx = await newfangDID.createSigned(IDs[0], doc, size, ueb, nonce,accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.createSigned(IDs[0], doc, size, nonce, ueb, accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
     assert.equal((await newfangDID.docs(IDs[0])).size, size);
   });
@@ -114,9 +114,9 @@ describe('CRUD', async () => {
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
 
-    let gas = await newfangDID.estimate.readSigned(IDs[0], nonce,accounts[1], sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.readSigned(IDs[0], nonce, accounts[1], sig.v, sig.r, sig.s);
     updateGas('read', parseInt(gas));
-    let tx = await newfangDID.readSigned(IDs[0], nonce,accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.readSigned(IDs[0], nonce, accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
   });
   it('Update', async () => {
@@ -129,9 +129,9 @@ describe('CRUD', async () => {
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
-    let gas = await newfangDID.estimate.updateSigned([IDs[0]], doc, nonce,accounts[1], sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.updateSigned([IDs[0]], doc, nonce, accounts[1], sig.v, sig.r, sig.s);
     updateGas('update', parseInt(gas));
-    let tx = await newfangDID.updateSigned([IDs[0]], doc, nonce,accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.updateSigned([IDs[0]], doc, nonce, accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
     assert.equal((await newfangDID.docs(IDs[0])).doc, doc);
   });
@@ -146,9 +146,9 @@ describe('CRUD', async () => {
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
     let sig = ethers.utils.splitSignature(signature);
 
-    let gas = await newfangDID.estimate.deleteSigned(IDs[0], nonce,accounts[1], sig.v, sig.r, sig.s);
+    let gas = await newfangDID.estimate.deleteSigned(IDs[0], nonce, accounts[1], sig.v, sig.r, sig.s);
     updateGas('delete', parseInt(gas));
-    let tx = await newfangDID.deleteSigned(IDs[0], nonce,accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.deleteSigned(IDs[0], nonce, accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
     assert.equal(
       (await newfangDID.docs(IDs[0])).doc,
