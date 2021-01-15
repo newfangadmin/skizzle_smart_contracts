@@ -1,11 +1,11 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0xEe0cB2dA491c7aA889C289fa6f9Ad4cca34047E1",
-      "constructorCode": "608060405234801561001057600080fd5b50611c45806100206000396000f3fe",
-      "bodyBytecodeHash": "b61e4d384533e4b3469cf19b9ba20c31eb90a94e47f27eb0a782107822d603ac",
-      "localBytecodeHash": "4c5a332904620b9414108f133a762f320b3578c4b00f7fd5ef48de98902f6dd4",
-      "deployedBytecodeHash": "4c5a332904620b9414108f133a762f320b3578c4b00f7fd5ef48de98902f6dd4",
+      "address": "0xC23563b88808bB0e2C9Afa84185093D02E086aA6",
+      "constructorCode": "608060405234801561001057600080fd5b50611bc4806100206000396000f3fe",
+      "bodyBytecodeHash": "87425321cece784a1af609abf3d28da445a223f43e203b3d033eef72b00eb455",
+      "localBytecodeHash": "e41f6700da1e0c75dfe347ab1466d1fa4af3eac8ab8812e5359b82ea243f1b32",
+      "deployedBytecodeHash": "e41f6700da1e0c75dfe347ab1466d1fa4af3eac8ab8812e5359b82ea243f1b32",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -53,22 +53,10 @@
               "src": "460:11:3"
             },
             {
-              "label": "n",
+              "label": "size",
               "astId": 325,
               "type": "t_uint256",
-              "src": "481:9:3"
-            },
-            {
-              "label": "k",
-              "astId": 327,
-              "type": "t_uint256",
-              "src": "500:9:3"
-            },
-            {
-              "label": "size",
-              "astId": 329,
-              "type": "t_uint256",
-              "src": "519:12:3"
+              "src": "481:12:3"
             }
           ]
         },
@@ -166,17 +154,17 @@
   "proxies": {
     "#/Skizzle": [
       {
-        "address": "0x1eA980a81534aa89044b0dF53aac6DCc881F83a5",
-        "version": "crates",
-        "implementation": "0xEe0cB2dA491c7aA889C289fa6f9Ad4cca34047E1",
-        "admin": "0x51B5C04e15327f308f37B33c7ab53dBd988F6A78",
+        "address": "0x588D037F9bF3bA240381EA75C9859556100e14CD",
+        "version": "creates",
+        "implementation": "0xC23563b88808bB0e2C9Afa84185093D02E086aA6",
+        "admin": "0xded3482AE987D66DfA74794d418aa7d05fe5943a",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "crates",
+  "version": "creates",
   "proxyAdmin": {
-    "address": "0x51B5C04e15327f308f37B33c7ab53dBd988F6A78"
+    "address": "0xded3482AE987D66DfA74794d418aa7d05fe5943a"
   }
 }
