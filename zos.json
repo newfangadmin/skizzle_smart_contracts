@@ -1,0 +1,15 @@
+{
+  "zosversion": "2.2",
+  "contracts": {
+    "Skizzle": "Skizzle"
+  },
+  "dependencies": {},
+  "name": "#",
+  "version": "crates",
+  "compiler": {
+    "manager": "truffle",
+    "compilerSettings": {
+      "optimizer": {}
+    }
+  }
+}
