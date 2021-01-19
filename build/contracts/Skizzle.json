@@ -15298,6 +15298,12 @@
     "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
   },
   "networks": {
+    "137": {
+      "links": {},
+      "events": {},
+      "address": "0x64A1c9e8C215cdB26BA3e387A6AE0f4305622D49",
+      "updated_at": 1611068863521
+    },
     "80001": {
       "links": {},
       "events": {},
@@ -15306,7 +15312,7 @@
     }
   },
   "schemaVersion": "3.1.0",
-  "updatedAt": "2021-01-19T14:42:53.231Z",
+  "updatedAt": "2021-01-19T15:07:13.021Z",
   "devdoc": {
     "methods": {}
   },
