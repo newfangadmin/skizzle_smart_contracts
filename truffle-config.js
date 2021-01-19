@@ -26,7 +26,16 @@ module.exports = {
       network_id: "*",
       timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true
+    },
+
+    mainnet: {
+      provider: () => new HDWalletProvider(config.private_key, `https://maticmainnet.skizzle.email/`),
+      production: true,    // Treats this network as if it was a public net. (default: false)
+      network_id: "*",
+      timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true
     }
+
   },
   mocha: {
     enableTimeouts: false,
