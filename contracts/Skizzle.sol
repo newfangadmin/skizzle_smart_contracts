@@ -14,7 +14,6 @@ contract Skizzle is Initializable {
 
     struct File {
         address owner;
-        bytes ueb;
         bytes32 doc;
         uint256 size;
     }
@@ -89,7 +88,6 @@ contract Skizzle is Initializable {
         bytes32 _doc,
         uint256 _size,
         uint256 _nonce,
-        bytes memory _ueb,
         address signer,
         uint8 v,
         bytes32 r,
@@ -103,7 +101,7 @@ contract Skizzle is Initializable {
         bytes32 payloadHash = keccak256(abi.encode(_file, _doc, _size, _nonce));
         getSigner(payloadHash, signer, v, r, s);
         // Just to check signature is valid or not.
-        docs[_file] = File(signer, _ueb, _doc, _size);
+        docs[_file] = File(signer, _doc, _size);
         nonce[signer][_nonce] = true;
         emit create(signer, _file, _doc, _size);
     }
