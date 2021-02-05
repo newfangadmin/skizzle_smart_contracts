@@ -1,11 +1,11 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0xE0654ac7a009802C13E86F81760Ff85D0D2392F5",
-      "constructorCode": "608060405234801561001057600080fd5b50611bc4806100206000396000f3fe",
-      "bodyBytecodeHash": "87425321cece784a1af609abf3d28da445a223f43e203b3d033eef72b00eb455",
-      "localBytecodeHash": "e41f6700da1e0c75dfe347ab1466d1fa4af3eac8ab8812e5359b82ea243f1b32",
-      "deployedBytecodeHash": "e41f6700da1e0c75dfe347ab1466d1fa4af3eac8ab8812e5359b82ea243f1b32",
+      "address": "0xd105584a7b2E317eDd1F18Fbd6205A743060585e",
+      "constructorCode": "608060405234801561001057600080fd5b50611903806100206000396000f3fe",
+      "bodyBytecodeHash": "89f9dfea90d8c62543c3b12a5688ad48c43c57ec52c07a7ad047ca8c74a7f748",
+      "localBytecodeHash": "b17db7cb92568b41dc4a0337fdb06e84192163c1f9197da82429f0d325828cce",
+      "deployedBytecodeHash": "b17db7cb92568b41dc4a0337fdb06e84192163c1f9197da82429f0d325828cce",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -41,29 +41,18 @@
               "src": "418:13:3"
             },
             {
-              "label": "ueb",
-              "astId": 321,
-              "type": "t_bytes",
-              "src": "441:9:3"
-            },
-            {
               "label": "doc",
-              "astId": 323,
+              "astId": 321,
               "type": "t_bytes32",
-              "src": "460:11:3"
+              "src": "441:11:3"
             },
             {
               "label": "size",
-              "astId": 325,
+              "astId": 323,
               "type": "t_uint256",
-              "src": "481:12:3"
+              "src": "462:12:3"
             }
           ]
-        },
-        "t_bytes": {
-          "id": "t_bytes",
-          "kind": "elementary",
-          "label": "bytes"
         },
         "t_bytes32": {
           "id": "t_bytes32",
@@ -154,17 +143,17 @@
   "proxies": {
     "#/Skizzle": [
       {
-        "address": "0x64A1c9e8C215cdB26BA3e387A6AE0f4305622D49",
-        "version": "creates",
-        "implementation": "0xE0654ac7a009802C13E86F81760Ff85D0D2392F5",
-        "admin": "0x038b75859CF803bDF3C4a7361E5650E4ef0e6772",
+        "address": "0x4199547C38FcC3DA42DAC5BB0850A6F020460207",
+        "version": "crates",
+        "implementation": "0xd105584a7b2E317eDd1F18Fbd6205A743060585e",
+        "admin": "0x401CABee9749fF0C5b7280F04D62784C5d465C27",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "creates",
+  "version": "crates",
   "proxyAdmin": {
-    "address": "0x038b75859CF803bDF3C4a7361E5650E4ef0e6772"
+    "address": "0x401CABee9749fF0C5b7280F04D62784C5d465C27"
   }
 }

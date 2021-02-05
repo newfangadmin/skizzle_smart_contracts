@@ -5,7 +5,7 @@
   },
   "dependencies": {},
   "name": "#",
-  "version": "creates",
+  "version": "crates",
   "compiler": {
     "manager": "truffle",
     "compilerSettings": {
