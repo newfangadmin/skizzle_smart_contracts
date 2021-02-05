@@ -78,10 +78,11 @@ describe('Contract initialization, DID creation', async () => {
 describe('CRUD', async () => {
   it('Create', async () => {
     let doc = ethers.utils.formatBytes32String('hash of document');
+    let fph = ethers.utils.formatBytes32String('');
     let size = 1200, nonce = new Date().getTime();
     let payload = ethers.utils.defaultAbiCoder.encode(
-      ['bytes32', 'bytes32', 'uint256', 'uint256'],
-      [IDs[0], doc, size, nonce]
+      ['bytes32', 'bytes32', 'uint256', 'bytes32', 'uint256'],
+      [IDs[0], doc, size, fph, nonce]
     );
     let payloadHash = ethers.utils.keccak256(payload);
     let signature = await provider.getSigner(accounts[1]).signMessage(ethers.utils.arrayify(payloadHash));
@@ -90,6 +91,7 @@ describe('CRUD', async () => {
       IDs[0],
       doc,
       size,
+      fph,
       nonce,
       accounts[1],
       sig.v,
@@ -97,7 +99,7 @@ describe('CRUD', async () => {
       sig.s
     );
     updateGas('create', parseInt(gas));
-    let tx = await newfangDID.createSigned(IDs[0], doc, size, nonce, accounts[1], sig.v, sig.r, sig.s);
+    let tx = await newfangDID.createSigned(IDs[0], doc, size, fph, nonce, accounts[1], sig.v, sig.r, sig.s);
     await tx.wait();
     assert.equal((await newfangDID.docs(IDs[0])).size, size);
   });
