@@ -1,11 +1,11 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0xd105584a7b2E317eDd1F18Fbd6205A743060585e",
-      "constructorCode": "608060405234801561001057600080fd5b50611903806100206000396000f3fe",
-      "bodyBytecodeHash": "89f9dfea90d8c62543c3b12a5688ad48c43c57ec52c07a7ad047ca8c74a7f748",
-      "localBytecodeHash": "b17db7cb92568b41dc4a0337fdb06e84192163c1f9197da82429f0d325828cce",
-      "deployedBytecodeHash": "b17db7cb92568b41dc4a0337fdb06e84192163c1f9197da82429f0d325828cce",
+      "address": "0x1EbB740df7FCbC8E188AD43B26D6ABFD65f95676",
+      "constructorCode": "608060405234801561001057600080fd5b5061193b806100206000396000f3fe",
+      "bodyBytecodeHash": "6bea66e2329ce9bed0e6493c4b7efcc3d76910418c94f86f57386d08c1b610fb",
+      "localBytecodeHash": "b62951b9de8278d664cc10e29a6abf0be21c8edc0ff7675bd7b5044882e14167",
+      "deployedBytecodeHash": "b62951b9de8278d664cc10e29a6abf0be21c8edc0ff7675bd7b5044882e14167",
       "types": {
         "t_bool": {
           "id": "t_bool",
@@ -51,6 +51,12 @@
               "astId": 323,
               "type": "t_uint256",
               "src": "462:12:3"
+            },
+            {
+              "label": "fph",
+              "astId": 325,
+              "type": "t_bytes32",
+              "src": "484:11:3"
             }
           ]
         },
@@ -143,17 +149,17 @@
   "proxies": {
     "#/Skizzle": [
       {
-        "address": "0x4199547C38FcC3DA42DAC5BB0850A6F020460207",
-        "version": "crates",
-        "implementation": "0xd105584a7b2E317eDd1F18Fbd6205A743060585e",
-        "admin": "0x401CABee9749fF0C5b7280F04D62784C5d465C27",
+        "address": "0x5bc05167ef72A104462B7B2C09a37034B4A73aC7",
+        "version": "creates",
+        "implementation": "0x1EbB740df7FCbC8E188AD43B26D6ABFD65f95676",
+        "admin": "0x3BB1c5e320B806ba2d8B11218dCc07A0625568FF",
         "kind": "Upgradeable"
       }
     ]
   },
   "zosversion": "2.2",
-  "version": "crates",
+  "version": "creates",
   "proxyAdmin": {
-    "address": "0x401CABee9749fF0C5b7280F04D62784C5d465C27"
+    "address": "0x3BB1c5e320B806ba2d8B11218dCc07A0625568FF"
   }
 }
