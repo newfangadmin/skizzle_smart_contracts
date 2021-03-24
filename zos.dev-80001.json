@@ -1,7 +1,7 @@
 {
   "contracts": {
     "Skizzle": {
-      "address": "0x1EbB740df7FCbC8E188AD43B26D6ABFD65f95676",
+      "address": "0xc9Bc2843249dFB5b7BC847F259B5Bcb9f69649e4",
       "constructorCode": "608060405234801561001057600080fd5b5061193b806100206000396000f3fe",
       "bodyBytecodeHash": "6bea66e2329ce9bed0e6493c4b7efcc3d76910418c94f86f57386d08c1b610fb",
       "localBytecodeHash": "b62951b9de8278d664cc10e29a6abf0be21c8edc0ff7675bd7b5044882e14167",
@@ -149,10 +149,10 @@
   "proxies": {
     "#/Skizzle": [
       {
-        "address": "0x5bc05167ef72A104462B7B2C09a37034B4A73aC7",
+        "address": "0x0766db94D92aD706c34d979FF5db0506C3cb91D7",
         "version": "creates",
-        "implementation": "0x1EbB740df7FCbC8E188AD43B26D6ABFD65f95676",
-        "admin": "0x3BB1c5e320B806ba2d8B11218dCc07A0625568FF",
+        "implementation": "0xc9Bc2843249dFB5b7BC847F259B5Bcb9f69649e4",
+        "admin": "0x9BefD2b2B265358754822Eb5B507A1a55Aa22A98",
         "kind": "Upgradeable"
       }
     ]
@@ -160,6 +160,6 @@
   "zosversion": "2.2",
   "version": "creates",
   "proxyAdmin": {
-    "address": "0x3BB1c5e320B806ba2d8B11218dCc07A0625568FF"
+    "address": "0x9BefD2b2B265358754822Eb5B507A1a55Aa22A98"
   }
 }
